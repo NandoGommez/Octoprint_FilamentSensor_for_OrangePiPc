@@ -148,8 +148,6 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
             self.debug_only_output('Confirmations: '+str(self.FilamentSensorOrangePiPcPlugin_confirmations_tracking))
             if self.confirmations<=self.FilamentSensorOrangePiPcPlugin_confirmations_tracking:
                 self._logger.info("Out of filament!")
-                if self.send_webhook
-                    self._logger.info("Sending a webhook to ifttt.")
                 if self.pause_print:
                     self._logger.info("Pausing print.")
                     self._printer.pause_print()
