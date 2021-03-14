@@ -133,10 +133,10 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
             self.debug_only_output('Confirmations: '+str(self.FilamentSensorOrangePiPcPlugin_confirmations_tracking))
             if self.confirmations<=self.FilamentSensorOrangePiPcPlugin_confirmations_tracking:
                 self._logger.info("Out of filament!")
+                subprocess.Popen("curl -X POST -H 'Content-Type: application/json' -d '{value1:Data1,value2:Data2,value3:Data3}' https://maker.ifttt.com/trigger/filament_runout/with/key/gJoDeTdbWUyZLywNIKgBZrfcSnmwZM_n9oWEzR2iJxy", shell=True)
                 if self.pause_print:
                     self._logger.info("Pausing print.")
                     self._printer.pause_print()
-                    p = subprocess.Popen("curl -X POST -H 'Content-Type: application/json' -d '{value1:Data1,value2:Data2,value3:Data3}' https://maker.ifttt.com/trigger/filament_runout/with/key/gJoDeTdbWUyZLywNIKgBZrfcSnmwZM_n9oWEzR2iJxy", shell=True)
                 if self.no_filament_gcode:
                     self._logger.info("Sending out of filament GCODE")
                     self._printer.commands(self.no_filament_gcode)
@@ -162,7 +162,7 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
         )
 
 __plugin_name__ = "FilamentSensor OrangePiPc"
-__plugin_version__ = "2.0.3"
+__plugin_version__ = "2.0.4"
 __plugin_pythoncompat__ = ">=2.7,<4"
 
 def __plugin_load__():
