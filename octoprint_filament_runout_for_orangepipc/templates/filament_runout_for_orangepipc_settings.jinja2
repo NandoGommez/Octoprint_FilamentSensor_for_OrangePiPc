@@ -1,4 +1,4 @@
-<h4>{{ _('FilamentSensor OrangePiPc 2021') }}</h4>
+<h4>{{ _('FilamentSensor OrangePiPc') }}</h4>
 <form class="form-horizontal">
     <div class="control-group">
         <label class="control-label">{{ _('Pin:') }}</label>
@@ -48,6 +48,28 @@
             <label class="checkbox">
                 <input type="checkbox" data-bind="checked: settings.plugins.filament_runout_for_orangepipc.pause_print"> {{ _('Pause print when out of filament') }}
             </label>
+        </div>
+    </div>
+<h4>{{ _('Webhook Configuration') }}</h4>
+    <div class="control-group">
+        <div class="controls" data-toggle="tooltip" title="{{ _('Send a webhook to IFTTT') }}">
+            <label class="checkbox">
+                <input type="checkbox" data-bind="checked: settings.plugins.filament_runout_for_orangepipc.send_webhook"> {{ _('Send webhook to IFTTT') }}
+            </label>
+        </div>
+    </div>
+
+    <div class="control-group">
+        <label class="control-label">{{ _('IFTTT Applet:') }}</label>
+        <div class="controls" title="{{ _('Your applet name') }}">
+            <textarea rows="1" class="block" data-bind="value: settings.plugins.filament_runout_for_orangepipc.ifttt_applet_name"></textarea>
+        </div>
+    </div>
+
+    <div class="control-group">
+        <label class="control-label">{{ _('IFTTT SecretKey:') }}</label>
+        <div class="controls" title="{{ _('Your SecretKey') }}">
+            <textarea rows="1" class="block" data-bind="value: settings.plugins.filament_runout_for_orangepipc.ifttt_secretkey"></textarea>
         </div>
     </div>
 </form>
