@@ -148,9 +148,9 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
             self.debug_only_output('Confirmations: '+str(self.FilamentSensorOrangePiPcPlugin_confirmations_tracking))
             if self.confirmations<=self.FilamentSensorOrangePiPcPlugin_confirmations_tracking:
                 self._logger.info("Out of filament!")
-                if self.send_webhook:
-                subprocess.Popen("curl -X POST -H 'Content-Type: application/json' https://maker.ifttt.com/trigger/%s/with/key/%s" % (self.ifttt_applet_name,self.ifttt_secretkey), shell=True)
-                self._logger.info("Sending a webhook to ifttt.")
+                if self.send_webhook
+                    subprocess.Popen("curl -X POST -H 'Content-Type: application/json' https://maker.ifttt.com/trigger/%s/with/key/%s" % (self.ifttt_applet_name,self.ifttt_secretkey), shell=True)
+                    self._logger.info("Sending a webhook to ifttt.")
                 if self.pause_print:
                     self._logger.info("Pausing print.")
                     self._printer.pause_print()
@@ -179,7 +179,7 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
         )
 
 __plugin_name__ = "FilamentSensor OrangePiPc"
-__plugin_version__ = "2.0.7"
+__plugin_version__ = "2.0.8"
 __plugin_pythoncompat__ = ">=2.7,<4"
 
 def __plugin_load__():
