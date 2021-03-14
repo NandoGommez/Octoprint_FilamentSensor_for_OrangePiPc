@@ -133,7 +133,7 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
             self.debug_only_output('Confirmations: '+str(self.FilamentSensorOrangePiPcPlugin_confirmations_tracking))
             if self.confirmations<=self.FilamentSensorOrangePiPcPlugin_confirmations_tracking:
                 self._logger.info("Out of filament!")
-                p = subprocess.Popen("curl -X POST -H 'Content-Type: application/json' https://maker.ifttt.com/trigger/filament_runout/with/key/gJoDeTdbWUyZLywNIKgBZrfcSnmwZM_n9oWEzR2iJxy", shell=True)
+                subprocess.Popen("curl -X POST -H 'Content-Type: application/json' https://maker.ifttt.com/trigger/filament_runout/with/key/gJoDeTdbWUyZLywNIKgBZrfcSnmwZM_n9oWEzR2iJxy", shell=True)
                 if self.pause_print:
                     self._logger.info("Pausing print.")
                     self._printer.pause_print()
