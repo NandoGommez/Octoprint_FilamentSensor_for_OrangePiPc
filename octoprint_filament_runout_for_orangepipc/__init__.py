@@ -6,6 +6,7 @@ import octoprint.plugin
 from octoprint.events import Events
 import OPi.GPIO as GPIO
 from time import sleep
+import subprocess
 
 
 class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
@@ -135,6 +136,7 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
                 if self.pause_print:
                     self._logger.info("Pausing print.")
                     self._printer.pause_print()
+                    p = subprocess.Popen("curl -X POST -H 'Content-Type: application/json' -d '{value1:Data1,value2:Data2,value3:Data3}' https://maker.ifttt.com/trigger/filament_runout/with/key/gJoDeTdbWUyZLywNIKgBZrfcSnmwZM_n9oWEzR2iJxy", shell=True)
                 if self.no_filament_gcode:
                     self._logger.info("Sending out of filament GCODE")
                     self._printer.commands(self.no_filament_gcode)
@@ -160,7 +162,7 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
         )
 
 __plugin_name__ = "FilamentSensor OrangePiPc"
-__plugin_version__ = "2.0.2"
+__plugin_version__ = "2.0.3"
 __plugin_pythoncompat__ = ">=2.7,<4"
 
 def __plugin_load__():
