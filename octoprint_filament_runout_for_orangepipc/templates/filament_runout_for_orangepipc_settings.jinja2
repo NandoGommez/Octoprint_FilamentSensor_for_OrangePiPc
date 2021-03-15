@@ -20,14 +20,9 @@
     </div>
 
     <div class="control-group">
-        <label class="control-label" for="filament_runout_for_orangepipc_settings_pinInput">{{ _('Pin number') }}</label>
-        <div class="controls">
-            <input id="filament_runout_for_orangepipc_settings_pinInput" type="text" class="input-mini" data-bind="value: settingsViewModel.settings.plugins.filament_runout_for_orangepipc.pin, disable:printing" required>
-            <span class="help-block">Which Raspberry Pi pin is your sensor output attached to? (0 disables the plugin) <a target="_blank" href="https://pinout.xyz/">Pinout help</a></span>
-            <div class="alert alert-error hidden" id="filament_runout_for_orangepipc_settings_badpin">
-                <i class="fas fa-info icon-info-sign iconRight"></i>
-                {{ _('Warning: The selected pin is not a standard "data" pin.') }}
-            </div>
+        <label class="control-label">{{ _('Pin:') }}</label>
+        <div class="controls" title="{{ _('Which Orange Pi GPIO pin your switch is attached to (-1 disables the plugin)') }}">
+            <textarea rows="1" class="block" data-bind="value: settings.plugins.filament_runout_for_orangepipc.pin"></textarea>
         </div>
     </div>
 
