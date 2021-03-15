@@ -5,6 +5,7 @@ import octoprint.plugin
 import re
 from octoprint.events import Events
 from time import sleep
+import orangepi.pc
 import OPi.GPIO as GPIO
 import flask
 
@@ -453,7 +454,7 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
 
 
 __plugin_name__ = "FilamentSensor OrangePiPc"
-__plugin_version__ = "2.2.2"
+__plugin_version__ = "2.2.3"
 __plugin_pythoncompat__ = ">=2.7,<4"
 
 
