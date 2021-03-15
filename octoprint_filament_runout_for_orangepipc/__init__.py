@@ -137,7 +137,7 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
 				# if mode set by 3rd party don't set it again
 				if not self.gpio_mode_disabled:
 					GPIO.cleanup()
-					GPIO.setmode(GPIO.BCM)
+					GPIO.setmode(orangepi.pc.BOARD)
 
 			# before read don't let the pin float
 			self._logger.debug("selected power is %s" % selected_power)
@@ -176,7 +176,7 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
 			if self.gpio_mode is 10:
 				GPIO.setmode(GPIO.SUNXI)
 			elif self.gpio_mode is 11:
-				GPIO.setmode(GPIO.BCM)
+				GPIO.setmode(orangepi.pc.BOARD)
 			self.gpio_mode_disabled = False
 		self._logger.info("Mode is %s" % (gpio_mode))
 
@@ -329,7 +329,7 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
 					if self.gpio_mode is 10:
 						GPIO.setmode(GPIO.SUNXI)
 					elif self.gpio_mode is 11:
-						GPIO.setmode(GPIO.BCM)
+						GPIO.setmode(orangepi.pc.BOARD)
 
 					# 0 = sensor is grounded, react to rising edge pulled up by pull up resistor
 					if self.power is 0:
@@ -453,7 +453,7 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
 
 
 __plugin_name__ = "FilamentSensor OrangePiPc"
-__plugin_version__ = "2.2.1"
+__plugin_version__ = "2.2.2"
 __plugin_pythoncompat__ = ">=2.7,<4"
 
 
