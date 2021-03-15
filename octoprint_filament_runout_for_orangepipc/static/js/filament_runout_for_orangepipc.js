@@ -84,51 +84,6 @@ $(function () {
                 }
             );
         }
-        self.checkWarningPullUp = function(event){
-            // Which mode are we using
-            var mode = parseInt($('#filament_runout_for_orangepipc_settings_gpioMode').val(),10);
-            // What pin is the sensor connected to
-            var pin = parseInt($('#filament_runout_for_orangepipc_settings_pinInput').val(),10);
-            // What is the sensor connected to - ground or 3.3v
-            var sensorCon = parseInt($('#filament_runout_for_orangepipc_settings_powerInput').val(),10);
-
-            // Show alerts
-            if (
-                sensorCon == 1 && (
-                    (mode == 10 && (pin==3 || pin == 5))
-                    ||
-                    (mode == 11 && (pin == 2 || pin == 3))
-                )
-            ){
-                $('#filament_runout_for_orangepipc_settings_pullupwarn').removeClass('hidden pulsAlert').addClass('pulsAlert');
-            }else{
-                $('#filament_runout_for_orangepipc_settings_pullupwarn').addClass('hidden').removeClass('pulsAlert');
-            }
-
-            // Set max to right board type - 10 = Boardmode
-            var showWarning = true;
-            if (mode == 10){
-                $('#filament_runout_for_orangepipc_settings_pinInput').attr('max',40);
-                if (pin != 0 && $.inArray(pin,self.validPinsBoard) == -1){
-                    showWarning = false;
-                    $('#filament_runout_for_orangepipc_settings_badpin').removeClass('hidden pulsAlert').addClass('pulsAlert');
-                }else{
-                    $('#filament_runout_for_orangepipc_settings_badpin').addClass('hidden').removeClass('pulsAlert');
-                }
-            }else{
-                $('#filament_runout_for_orangepipc_settings_pinInput').attr('max',27);
-            }
-
-            // High or low
-            if ($('#filament_runout_for_orangepipc_settings_pinInput').attr('max') < pin || pin < 0){
-                $('#filament_runout_for_orangepipc_settings_badpin').removeClass('hidden pulsAlert').addClass('pulsAlert');
-            }else{
-                // If the warning is not already shown then show it now
-                if (showWarning){
-                    $('#filament_runout_for_orangepipc_settings_badpin').addClass('hidden').removeClass('pulsAlert');
-                }
-            }
-        }
 
         self.getDisabled = function (item) {
             $.ajax({
