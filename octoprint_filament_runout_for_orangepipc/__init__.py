@@ -435,7 +435,7 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
 		# Define the configuration for your plugin to use with the Software Update
 		# Plugin here. See https://docs.octoprint.org/en/master/bundledplugins/softwareupdate.html
 		# for details.
-        return dict(
+		return dict(
             octoprint_filament_runout_for_orangepipc=dict(
                 displayName="FilamentSensor OrangePiPc",
                 displayVersion=self._plugin_version,
@@ -448,12 +448,12 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
 
                 # update method: pip
                 pip="https://github.com/NandoGommez/Octoprint_FilamentSensor_for_OrangePiPc/archive/master.zip"
-            )
-        )
+			)
+		)
 
 
 __plugin_name__ = "FilamentSensor OrangePiPc"
-__plugin_version__ = "2.2.0"
+__plugin_version__ = "2.2.1"
 __plugin_pythoncompat__ = ">=2.7,<4"
 
 
