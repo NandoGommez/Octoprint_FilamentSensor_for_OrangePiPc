@@ -101,8 +101,8 @@ $(function () {
             self.testSensorResult("");
             self.getDisabled();
              // Check for broken settings
-            $('#filament_runout_for_orangepipc_settings_gpioMode, #filament_runout_for_orangepipc_settings_pinInput, #filament_runout_for_orangepipc_settings_powerInput').off('change.fsensor').on('change.fsensor',self.checkWarningPullUp);
-            $('#filament_runout_for_orangepipc_settings_gpioMode').trigger('change.fsensor');
+            //$('#filament_runout_for_orangepipc_settings_gpioMode, #filament_runout_for_orangepipc_settings_pinInput, #filament_runout_for_orangepipc_settings_powerInput').off('change.fsensor').on('change.fsensor',self.checkWarningPullUp);
+            //$('#filament_runout_for_orangepipc_settings_gpioMode').trigger('change.fsensor');
         }
     }
 
