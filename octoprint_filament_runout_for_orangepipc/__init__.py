@@ -3,6 +3,7 @@ from __future__ import absolute_import
 from flask import jsonify
 
 import octoprint.plugin
+from octoprint.server import user_permission
 from octoprint.events import Events
 import OPi.GPIO as GPIO
 from time import sleep
@@ -98,6 +99,21 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
     def sensor_enabled(self):
         return self.pin != '-1'
 
+    def get_api_commands(self):
+        return dict(
+            getFilamentState=[]
+        )
+
+    def on_api_get(self, request):
+        return self.on_api_command("getFilamentState", [])
+
+    def on_api_command(self, command, data):
+        if not user_permission.can():
+            return make_response("Insufficient rights", 403)
+        
+        if command == 'getFilamentState':
+            return jsonify(isFilament=GPIO.input(self.pin))
+
     def no_filament(self):
         return GPIO.input(self.pin) != self.switch
 
@@ -162,6 +178,14 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
                 self.FilamentSensorOrangePiPcPlugin_confirmations_tracking = 0
         else:
             self.FilamentSensorOrangePiPcPlugin_confirmations_tracking = 0
+    
+    def get_assets(self):
+        return {
+            "js": ["js/psucontrol.js"],
+            "less": ["less/psucontrol.less"],
+            "css": ["css/psucontrol.min.css"]
+
+        }
 
     def get_update_information(self):
         return dict(
@@ -181,7 +205,7 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
         )
 
 __plugin_name__ = "FilamentSensor OrangePiPc"
-__plugin_version__ = "2.1.1"
+__plugin_version__ = "2.1.2"
 __plugin_pythoncompat__ = ">=2.7,<4"
 
 def __plugin_load__():
