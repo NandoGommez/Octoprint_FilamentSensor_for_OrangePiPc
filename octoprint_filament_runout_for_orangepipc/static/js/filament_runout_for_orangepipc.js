@@ -1,11 +1,11 @@
-$(function () {
+$(function() {
     function filament_runout_for_orangepipcViewModel(parameters) {
         var self = this;
-        
+
         self.settingsViewModel = parameters[0];
 
-        self.onDataUpdaterPluginMessage = function (plugin, data) {
-            if (plugin !== "filament_runout_for_orangepipc") {
+        self.onDataUpdaterPluginMessage = function(plugin, data) {
+            if (plugin != "filament_runout_for_orangepipc") {
                 return;
             }
 
@@ -15,15 +15,18 @@ $(function () {
                 type: data.type,
                 hide: data.autoClose
             });
-
         }
     }
 
-    // This is how our plugin registers itself with the application, by adding some configuration
-    // information to the global variable OCTOPRINT_VIEWMODELS
-    ADDITIONAL_VIEWMODELS.push({
-        construct: filament_runout_for_orangepipcViewModel,
-        dependencies: ["settingsViewModel"],
-        elements: ["#settings_plugin_filament_runout_for_orangepipc"]
-    })
-})
+    ADDITIONAL_VIEWMODELS.push([
+        filament_runout_for_orangepipcViewModel,
+
+        // This is a list of dependencies to inject into the plugin, the order which you request
+        // here is the order in which the dependencies will be injected into your view model upon
+        // instantiation via the parameters argument
+        [],
+
+        // Finally, this is the list of selectors for all elements we want this view model to be bound to.
+        []
+    ]);
+});
