@@ -181,9 +181,9 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
     
     def get_assets(self):
         return {
-            "js": ["js/psucontrol.js"],
-            "less": ["less/psucontrol.less"],
-            "css": ["css/psucontrol.min.css"]
+            "js": ["js/filament_runout_for_orangepipc.js"],
+            "less": ["less/filament_runout_for_orangepipc.less"],
+            "css": ["css/filament_runout_for_orangepipc.min.css"]
 
         }
 
@@ -205,7 +205,7 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
         )
 
 __plugin_name__ = "FilamentSensor OrangePiPc"
-__plugin_version__ = "2.1.2"
+__plugin_version__ = "2.1.3"
 __plugin_pythoncompat__ = ">=2.7,<4"
 
 def __plugin_load__():
