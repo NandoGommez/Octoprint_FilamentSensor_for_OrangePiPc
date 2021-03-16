@@ -1,5 +1,8 @@
 $(function () {
     function filament_runout_for_orangepipcViewModel(parameters) {
+        var self = this;
+        
+        self.settingsViewModel = parameters[0];
 
         self.onDataUpdaterPluginMessage = function (plugin, data) {
             if (plugin !== "filament_runout_for_orangepipc") {
