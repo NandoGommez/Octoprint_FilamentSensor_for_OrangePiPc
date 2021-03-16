@@ -60,9 +60,6 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
     def ifttt_secretkey(self):
         return str(self._settings.get(["ifttt_secretkey"]))
 
-    def get_assets(self):
-        return dict(js=["js/filament_runout_for_orangepipc.js"])
-
     def _setup_sensor(self):
         if self.sensor_enabled():
             self._logger.info("Using SUNXI Mode")
@@ -179,6 +176,9 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
                 self.FilamentSensorOrangePiPcPlugin_confirmations_tracking = 0
         else:
             self.FilamentSensorOrangePiPcPlugin_confirmations_tracking = 0
+    
+    def get_assets(self):
+        return dict(js=["js/filament_runout_for_orangepipc.js"])
 
     def get_update_information(self):
         return dict(
@@ -198,7 +198,7 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
         )
 
 __plugin_name__ = "FilamentSensor OrangePiPc"
-__plugin_version__ = "2.1.6"
+__plugin_version__ = "2.1.7"
 __plugin_pythoncompat__ = ">=2.7,<4"
 
 def __plugin_check__():
