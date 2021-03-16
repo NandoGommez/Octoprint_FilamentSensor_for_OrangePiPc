@@ -1,6 +1,6 @@
 # coding=utf-8
 from __future__ import absolute_import
-from flask import jsonify
+import flask
 
 import octoprint.plugin
 from octoprint.events import Events
@@ -113,7 +113,6 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
                                                                  dict(type="error", autoClose=True,
                                                                       msg="No filament detected! Print cancelled."))
             self._printer.cancel_print()
-            GPIO.cleanup()
         # Early abort in case of out ot filament when resume printing
         if event is Events.PRINT_RESUMED and self.no_filament():
             self._logger.info("Printing aborted: no filament detected!")
@@ -121,7 +120,6 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
                                                                  dict(type="error", autoClose=True,
                                                                       msg="No filament detected! Print cancelled."))
             self._printer.cancel_print()
-            GPIO.cleanup()
         # Enable sensor
         if event in (
             Events.PRINT_STARTED,
@@ -147,7 +145,6 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
         ):
             self._logger.info("%s: Disabling filament sensor." % (event))
             GPIO.remove_event_detect(self.pin)
-            GPIO.cleanup()
 
     @octoprint.plugin.BlueprintPlugin.route("/status", methods=["GET"])
     def check_status(self):
@@ -198,8 +195,15 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
         )
 
 __plugin_name__ = "FilamentSensor OrangePiPc"
-__plugin_version__ = "2.1.1"
+__plugin_version__ = "2.1.2"
 __plugin_pythoncompat__ = ">=2.7,<4"
+
+def __plugin_check__():
+    try:
+        import OPi.GPIO as GPIO
+    except ImportError:
+        return False
+    return True
 
 def __plugin_load__():
     global __plugin_implementation__
