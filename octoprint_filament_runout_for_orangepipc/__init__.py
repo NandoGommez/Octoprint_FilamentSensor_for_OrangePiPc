@@ -109,26 +109,20 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
         # can't change with a cold nozzle
         if event is Events.PRINT_STARTED and self.no_filament():
             self._logger.info("Printing aborted: no filament detected!")
-            self._plugin_manager.send_plugin_message(self._identifier,
-                                                                 dict(type="error", autoClose=True,
-                                                                      msg="No filament detected! Print cancelled."))
+            self._plugin_manager.send_plugin_message(self._identifier,dict(type="error", autoClose=True,msg="No filament detected! Print cancelled."))
             self._printer.cancel_print()
-        # Early abort in case of out ot filament when resume printing
+        # Early pause in case of out ot filament when resume printing
         if event is Events.PRINT_RESUMED and self.no_filament():
             self._logger.info("Printing aborted: no filament detected!")
-            self._plugin_manager.send_plugin_message(self._identifier,
-                                                                 dict(type="error", autoClose=True,
-                                                                      msg="No filament detected! Print cancelled."))
-            self._printer.cancel_print()
+            self._plugin_manager.send_plugin_message(self._identifier,dict(type="error", autoClose=True,msg="No filament detected! Print cancelled."))
+            self._printer.pause_print()
         # Enable sensor
         if event in (
             Events.PRINT_STARTED,
             Events.PRINT_RESUMED
         ):
             self._logger.info("%s: Enabling filament sensor." % (event))
-            self._plugin_manager.send_plugin_message(self._identifier,
-                                                                 dict(type="info", autoClose=True,
-                                                                      msg="Enabling filament sensor."))
+            self._plugin_manager.send_plugin_message(self._identifier,dict(type="info", autoClose=True,msg="Enabling filament sensor."))
             if self.sensor_enabled():
                 GPIO.remove_event_detect(self.pin)
                 GPIO.add_event_detect(
@@ -166,9 +160,7 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
                     self._logger.info("Sending a webhook to ifttt.")
                 if self.pause_print:
                     self._logger.info("Pausing print.")
-                    self._plugin_manager.send_plugin_message(self._identifier,
-                                                                 dict(type="error", autoClose=False,
-                                                                      msg="No filament detected! Print paused."))
+                    self._plugin_manager.send_plugin_message(self._identifier,dict(type="error", autoClose=False,msg="No filament detected! Print paused."))
                     self._printer.pause_print()
                 if self.no_filament_gcode:
                     self._logger.info("Sending out of filament GCODE")
@@ -195,7 +187,7 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
         )
 
 __plugin_name__ = "FilamentSensor OrangePiPc"
-__plugin_version__ = "2.1.2"
+__plugin_version__ = "2.1.3"
 __plugin_pythoncompat__ = ">=2.7,<4"
 
 def __plugin_check__():
