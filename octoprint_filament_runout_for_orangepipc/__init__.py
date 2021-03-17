@@ -86,7 +86,10 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
             return make_response("Insufficient rights", 403)
         
         if command == 'getFilamentState':
-            return jsonify(isFilamentOn=self.no_filament())
+        	if GPIO.input(self.pin) == self.switch:
+            return jsonify(isFilamentOn=False)
+            else
+            return jsonify(isFilamentOn=True)
 
     def get_settings_defaults(self):
         return({
@@ -152,7 +155,7 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
             self._plugin_manager.send_plugin_message(self._identifier,
                                                                      dict(type="info", autoClose=True,
                                                                           msg="Enabling filament sensor."))
-            self._plugin_manager.send_plugin_message(self._identifier, dict(isFilamentOn=self.no_filament()))
+            self._plugin_manager.send_plugin_message(self._identifier, dict(isFilamentOn=True))
             if self.sensor_enabled():
                 GPIO.remove_event_detect(self.pin)
                 GPIO.add_event_detect(
@@ -193,7 +196,7 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
                     self._plugin_manager.send_plugin_message(self._identifier,
                                                                      dict(type="error", autoClose=False,
                                                                           msg="No filament detected! Print paused."))
-                    self._plugin_manager.send_plugin_message(self._identifier, dict(isFilamentOn=self.no_filament()))
+                    self._plugin_manager.send_plugin_message(self._identifier, dict(isFilamentOn=False))
                     self._printer.pause_print()
                 if self.no_filament_gcode:
                     self._logger.info("Sending out of filament GCODE")
@@ -221,7 +224,7 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
         )
 
 __plugin_name__ = "FilamentSensor OrangePiPc"
-__plugin_version__ = "2.1.11c"
+__plugin_version__ = "2.1.11d"
 __plugin_pythoncompat__ = ">=2.7,<4"
 
 def __plugin_check__():
