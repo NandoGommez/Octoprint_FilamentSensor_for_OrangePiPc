@@ -33,6 +33,7 @@ $(function() {
             });
         }
     }
+    }
 
     ADDITIONAL_VIEWMODELS.push([
         filament_runout_for_orangepipcViewModel,
