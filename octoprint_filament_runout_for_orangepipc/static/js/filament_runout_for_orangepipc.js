@@ -4,9 +4,25 @@ $(function() {
 
         self.settingsViewModel = parameters[0];
 
+        self.isFilamentOn = ko.observable(undefined);
+        self.filamentstats_indicator = $("#filament_indicator");
+
+        self.onStartup = function () {
+            self.isFilamentOn.subscribe(function() {
+                if (self.isFilamentOn()) {
+                    self.filamentstats_indicator.removeClass("off").addClass("on");
+                } else {
+                    self.filamentstats_indicator.removeClass("on").addClass("off");
+                }   
+            });
+
         self.onDataUpdaterPluginMessage = function(plugin, data) {
             if (plugin != "filament_runout_for_orangepipc") {
                 return;
+            }
+
+            if (data.isFilamentOn !== undefined) {
+                self.isFilamentOn(data.isFilamentOn);
             }
 
             new PNotify({
@@ -27,6 +43,6 @@ $(function() {
         [],
 
         // Finally, this is the list of selectors for all elements we want this view model to be bound to.
-        []
+        ["#navbar_plugin_filament_runout_for_orangepipc"]
     ]);
 });
