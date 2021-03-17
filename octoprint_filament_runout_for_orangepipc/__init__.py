@@ -75,10 +75,8 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
         self._logger.info("FilamentSensor-OrangePiPc started")
         self._setup_sensor()
 
-	def get_api_commands(self):
-        return dict(
-            getFilamentState=[]
-        )
+    def get_api_commands(self):
+        return dict(getFilamentState=[])
 
     def on_api_get(self, request):
         return self.on_api_command("getFilamentState", [])
@@ -223,7 +221,7 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
         )
 
 __plugin_name__ = "FilamentSensor OrangePiPc"
-__plugin_version__ = "2.1.11b"
+__plugin_version__ = "2.1.11c"
 __plugin_pythoncompat__ = ">=2.7,<4"
 
 def __plugin_check__():
