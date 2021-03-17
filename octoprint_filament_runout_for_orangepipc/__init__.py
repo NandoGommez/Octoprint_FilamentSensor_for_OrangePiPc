@@ -14,6 +14,7 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
                              octoprint.plugin.TemplatePlugin,
                              octoprint.plugin.SettingsPlugin,
                              octoprint.plugin.AssetPlugin,
+                             octoprint.plugin.SimpleApiPlugin,
                              octoprint.plugin.RestartNeedingPlugin):
 
     def initialize(self):
@@ -73,6 +74,21 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
     def on_after_startup(self):
         self._logger.info("FilamentSensor-OrangePiPc started")
         self._setup_sensor()
+
+	def get_api_commands(self):
+        return dict(
+            getFilamentState=[]
+        )
+
+    def on_api_get(self, request):
+        return self.on_api_command("getFilamentState", [])
+
+    def on_api_command(self, command, data):
+        if not user_permission.can():
+            return make_response("Insufficient rights", 403)
+        
+        if command == 'getFilamentState':
+            return jsonify(isFilamentOn=self.no_filament())
 
     def get_settings_defaults(self):
         return({
@@ -207,7 +223,7 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
         )
 
 __plugin_name__ = "FilamentSensor OrangePiPc"
-__plugin_version__ = "2.1.11a"
+__plugin_version__ = "2.1.11b"
 __plugin_pythoncompat__ = ">=2.7,<4"
 
 def __plugin_check__():
