@@ -16,6 +16,20 @@ $(function() {
                 }   
             });
 
+            $.ajax({
+                url: API_BASEURL + "plugin/ilament_runout_for_orangepipc",
+                type: "POST",
+                dataType: "json",
+                data: JSON.stringify({
+                    command: "getFilamentState"
+                }),
+                contentType: "application/json; charset=UTF-8"
+            }).done(function(data) {
+                self.isFilamentOn(data.isFilamentOn);
+            });
+
+        }
+
         self.onDataUpdaterPluginMessage = function(plugin, data) {
             if (plugin != "filament_runout_for_orangepipc") {
                 return;
@@ -32,7 +46,7 @@ $(function() {
                 hide: data.autoClose
             });
         }
-    }
+    
     }
 
     ADDITIONAL_VIEWMODELS.push([
