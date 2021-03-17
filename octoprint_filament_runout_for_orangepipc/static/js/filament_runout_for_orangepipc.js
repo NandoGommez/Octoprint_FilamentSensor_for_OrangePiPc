@@ -37,7 +37,7 @@ $(function() {
 
             if (data.isFilamentOn !== undefined) {
                 self.isFilamentOn(data.isFilamentOn);
-            }
+            } else {
 
             new PNotify({
                 title: 'FilamentSensor OrangePiPc',
@@ -45,6 +45,7 @@ $(function() {
                 type: data.type,
                 hide: data.autoClose
             });
+            }
         }
     
     }
