@@ -86,10 +86,10 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
             return make_response("Insufficient rights", 403)
         
         if command == 'getFilamentState':
-        	if GPIO.input(self.pin) == self.switch:
-            return jsonify(isFilamentOn=False)
-            else
-            return jsonify(isFilamentOn=True)
+			if GPIO.input(self.pin) == self.switch:
+				return jsonify(isFilamentOn=False)
+			else:
+				return jsonify(isFilamentOn=True)
 
     def get_settings_defaults(self):
         return({
