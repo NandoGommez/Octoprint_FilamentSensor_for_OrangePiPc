@@ -103,7 +103,12 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
         return GPIO.input(self.pin) == self.switch
 
     def get_assets(self):
-        return dict(js=["js/filament_runout_for_orangepipc.js"])
+        return {
+            "js": ["js/filament_runout_for_orangepipc.js"],
+            "less": ["less/filament_runout_for_orangepipc.less"],
+            "css": ["css/filament_runout_for_orangepipc.min.css"]
+
+        }
 
     def get_template_configs(self):
         return [dict(type="settings", custom_bindings=False)]
@@ -133,6 +138,7 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
             self._plugin_manager.send_plugin_message(self._identifier,
                                                                      dict(type="info", autoClose=True,
                                                                           msg="Enabling filament sensor."))
+            self._plugin_manager.send_plugin_message(self._identifier, dict(isFilamentOn=self.no_filament()))
             if self.sensor_enabled():
                 GPIO.remove_event_detect(self.pin)
                 GPIO.add_event_detect(
@@ -173,6 +179,7 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
                     self._plugin_manager.send_plugin_message(self._identifier,
                                                                      dict(type="error", autoClose=False,
                                                                           msg="No filament detected! Print paused."))
+                    self._plugin_manager.send_plugin_message(self._identifier, dict(isFilamentOn=self.no_filament()))
                     self._printer.pause_print()
                 if self.no_filament_gcode:
                     self._logger.info("Sending out of filament GCODE")
@@ -200,7 +207,7 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
         )
 
 __plugin_name__ = "FilamentSensor OrangePiPc"
-__plugin_version__ = "2.1.9"
+__plugin_version__ = "2.1.10"
 __plugin_pythoncompat__ = ">=2.7,<4"
 
 def __plugin_check__():
