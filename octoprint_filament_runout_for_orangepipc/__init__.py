@@ -77,7 +77,7 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
         if self.sensor_enabled() and self.sensor_enabled_relay():
             self._logger.info("Using SUNXI Mode")
             GPIO.setmode(GPIO.SUNXI)
-            self._logger.info("Both Sensor active on GPIO Pin [%s] and [%s]"%self.pin,self.pin_relay)
+            self._logger.info("Both Pin activated")
             chan_list = [self.pin,self.pin_relay]
             GPIO.setup(chan_list, GPIO.IN)
         elif self.sensor_enabled():
@@ -206,12 +206,12 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
                 self._logger.info("Out of filament!")
                 if self.send_webhook:
                     subprocess.Popen("curl -X POST -H 'Content-Type: application/json' https://maker.ifttt.com/trigger/%s/with/key/%s" % (self.ifttt_applet_name_pin1,self.ifttt_secretkey), shell=True)
-                    self._logger.info("Sending a webhook to ifttt.")
-                if self.pause_print:
-                    self._logger.info("Pausing print.")
                     self._plugin_manager.send_plugin_message(self._identifier,
                                                                      dict(type="error", autoClose=False,
                                                                           msg="No filament detected! Print paused."))
+                    self._logger.info("Pin 1 Sending a webhook to ifttt.")
+                if self.pause_print:
+                    self._logger.info("Pausing print.")
                     self._printer.pause_print()
                 if self.no_filament_gcode:
                     self._logger.info("Sending out of filament GCODE")
@@ -224,10 +224,14 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
         sleep(self.poll_time/1000)
         self.debug_only_output('Pin: '+str(GPIO.input(self.pin_relay)))
         if self.relay_detected():
+            self._printer.cancel_print()
+            self._plugin_manager.send_plugin_message(self._identifier,
+                                                                     dict(type="error", autoClose=False,
+                                                                          msg="Pin 2 Triggered! Print Canceled."))
             if self.send_webhook:
                 subprocess.Popen("curl -X POST -H 'Content-Type: application/json' https://maker.ifttt.com/trigger/%s/with/key/%s" % (self.ifttt_applet_name_pin2,self.ifttt_secretkey), shell=True)
-                self._logger.info("Sending a webhook to ifttt.")
-                self._printer.cancel_print()
+                self._logger.info("Pin 2 Sending a webhook to ifttt.")
+                
 
     def get_update_information(self):
         return dict(
@@ -247,7 +251,7 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
         )
 
 __plugin_name__ = "FilamentSensor OrangePiPc"
-__plugin_version__ = "2.1.10"
+__plugin_version__ = "2.1.11"
 __plugin_pythoncompat__ = ">=2.7,<4"
 
 def __plugin_check__():
