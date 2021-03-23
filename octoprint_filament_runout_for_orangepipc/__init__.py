@@ -191,7 +191,7 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
             Events.PRINT_CANCELLED,
             Events.ERROR
         ):
-
+            self._logger.info("%s: Disabling filament sensor." % (event))
 
     @octoprint.plugin.BlueprintPlugin.route("/status", methods=["GET"])
     def check_status(self):
@@ -255,7 +255,7 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
         )
 
 __plugin_name__ = "FilamentSensor OrangePiPc"
-__plugin_version__ = "2.1.12"
+__plugin_version__ = "2.1.13"
 __plugin_pythoncompat__ = ">=2.7,<4"
 
 def __plugin_check__():
