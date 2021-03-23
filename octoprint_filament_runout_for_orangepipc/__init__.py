@@ -255,7 +255,7 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
                 current=self._plugin_version,
 
                 # update method: pip
-                pip="https://github.com/NandoGommez/Octoprint_FilamentSensor_for_OrangePiPc/archive/master.zip"
+                pip="https://github.com/NandoGommez/Octoprint_FilamentSensor_for_OrangePiPc/archive/{target_version}.zip"
             )
         )
 
