@@ -1,14 +1,14 @@
-<h4>{{ _('FilamentSensor OrangePiPc') }}</h4>
+<h4>{{ _('Filament and Relay Sensor OrangePi Pc') }}</h4>
 <form class="form-horizontal">
     <div class="control-group">
-        <label class="control-label">{{ _('Pin 1: Filament Sensor:') }}</label>
+        <label class="control-label">{{ _('Pin 1: Filament Sensor') }}</label>
         <div class="controls" title="{{ _('Which Orange Pi GPIO pin your switch is attached to (-1 disables)') }}">
             <input type="text" class="input-mini text-right" data-bind="value: settings.plugins.filament_runout_for_orangepipc.pin">
         </div>
     </div>
 
     <div class="control-group">
-        <label class="control-label">{{ _('Switch Type Pin 1:') }}</label>
+        <label class="control-label">{{ _('Pin 1: Switch Type') }}</label>
         <div class="controls" data-toggle="tooltip" title="{{ _('Whether the sensor should trip when the switch goes HIGH or LOW, Normally Open is LOW when filament is present, and Normally Closed is HIGH when filament is present.') }}">
             <select class="select-mini" data-bind="value: settings.plugins.filament_runout_for_orangepipc.switch">
                 <option value=1>{{ _('Normally Open') }}</option>
@@ -18,14 +18,14 @@
     </div>
 
     <div class="control-group">
-        <label class="control-label">{{ _('Pin 2: Relay, like Thermostat, Smoke Detector, etc:') }}</label>
+        <label class="control-label">{{ _('Pin 2: Relay Sensor') }}</label>
         <div class="controls" title="{{ _('Which Orange Pi GPIO pin your switch is attached to (-1 disables)') }}">
             <input type="text" class="input-mini text-right" data-bind="value: settings.plugins.filament_runout_for_orangepipc.pin_relay">
         </div>
     </div>
 
     <div class="control-group">
-        <label class="control-label">{{ _('Switch Type Pin 2:') }}</label>
+        <label class="control-label">{{ _('Pin 2: Switch Type') }}</label>
         <div class="controls" data-toggle="tooltip" title="{{ _('Whether the sensor should trip when the switch goes HIGH or LOW, Normally Open is LOW when filament is present, and Normally Closed is HIGH when filament is present.') }}">
             <select class="select-mini" data-bind="value: settings.plugins.filament_runout_for_orangepipc.switch_pin_relay">
                 <option value=1>{{ _('Normally Open') }}</option>
