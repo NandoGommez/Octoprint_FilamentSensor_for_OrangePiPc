@@ -93,8 +93,7 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
 
 
     def on_after_startup(self):
-        self._setup_filament_sensor()
-        self._setup_relay_sensor()
+        self.debug_only_output('Plugin Loaded')
 
     def get_settings_defaults(self):
         return({
@@ -120,7 +119,6 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
 
     def on_settings_save(self, data):
         octoprint.plugin.SettingsPlugin.on_settings_save(self, data)
-        GPIO.cleanup()
         self._setup_filament_sensor()
         self._setup_relay_sensor()
 
@@ -143,62 +141,62 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
         return [dict(type="settings", custom_bindings=False)]
 
     def on_event(self, event, payload):
-        # Early abort in case of out ot filament when start printing, as we
-        # can't change with a cold nozzle
-        if GPIO.input(self.pin):
-            self.debug_only_output('Filament Sensor already ACTIVE')
-        else:
-            self._setup_filament_sensor()
-            self.debug_only_output('Activating Filament Sensor')
-        
-        if GPIO.input(self.pin_relay):
-            self.debug_only_output('Relay Sensor already ACTIVE')
-        else:
-            self._setup_relay_sensor()
-            self.debug_only_output('Activating Relay Sensor')
-
+        # Enable Filament Sensor
         if self.sensor_enabled():
-            if event is Events.PRINT_STARTED and self.no_filament():
-                self._logger.info("Printing aborted: no filament detected!")
-                self._plugin_manager.send_plugin_message(self._identifier,
-                                                                     dict(title="Filament Sensor", type="error", autoClose=True,
-                                                                          msg="No filament detected! Print aborted."))
-                self._printer.cancel_print()
-            # Early pause in case of out ot filament when resume printing
-            if event is Events.PRINT_RESUMED and self.no_filament():
-                self._logger.info("Printing aborted: no filament detected!")
-                self._plugin_manager.send_plugin_message(self._identifier,
-                                                                     dict(title="Filament Sensor", type="error", autoClose=True,
-                                                                          msg="No filament detected! Print paused."))
-                self._printer.pause_print()
-        # Enable sensor
-        if event in (
-            Events.PRINT_STARTED,
-            Events.PRINT_RESUMED
-        ):
-            
-            if self.sensor_enabled():
+            if event in (Events.PRINT_STARTED):
                 self._logger.info("%s: Enabling Filament sensor." % (event))
                 self._plugin_manager.send_plugin_message(self._identifier,
                                                                      dict(title="Filament Sensor", type="info", autoClose=True,
                                                                           msg="Enabling Filament Sensor."))
-                GPIO.remove_event_detect(self.pin)
+                self._setup_filament_sensor()
                 GPIO.add_event_detect(
-                    self.pin, GPIO.RISING,
+                    self.pin, GPIO.BOTH,
                     callback=self.sensor_callback,
                     bouncetime=self.poll_time
                 )
-            if self.sensor_enabled_relay():
+        # Enable Relay Sensor
+        if self.sensor_enabled_relay():
+            if event in (Events.PRINT_STARTED):
                 self._logger.info("%s: Enabling Relay sensor." % (event))
                 self._plugin_manager.send_plugin_message(self._identifier,
                                                                      dict(title="Relay Sensor", type="info", autoClose=True,
                                                                           msg="Enabling Relay Sensor."))
-                GPIO.remove_event_detect(self.pin_relay)
+                self._setup_relay_sensor()
                 GPIO.add_event_detect(
-                    self.pin_relay, GPIO.RISING,
+                    self.pin_relay, GPIO.BOTH,
                     callback=self.sensor_callback_relay,
                     bouncetime=self.poll_time
                 )
+
+        # Resume Print and Sensor
+        if event in (Events.PRINT_RESUMED):
+            
+            if self.sensor_enabled():
+                GPIO.add_event_detect(
+                    self.pin, GPIO.BOTH,
+                    callback=self.sensor_callback,
+                    bouncetime=self.poll_time
+                )
+                if self.no_filament():
+                    self._logger.info("Printing aborted: no filament detected!")
+                    self._plugin_manager.send_plugin_message(self._identifier,
+                                                                     dict(title="Filament Sensor", type="error", autoClose=True,
+                                                                          msg="No filament detected! Print paused."))
+                    self._printer.pause_print()
+
+
+            if self.sensor_enabled_relay():
+                GPIO.add_event_detect(
+                    self.pin_relay, GPIO.BOTH,
+                    callback=self.sensor_callback_relay,
+                    bouncetime=self.poll_time
+                )
+                if self.relay_detected():
+                    self._plugin_manager.send_plugin_message(self._identifier,
+                                                                     dict(title="Relay Sensor", type="error", autoClose=True,
+                                                                          msg="Relay Sensor Triggered!"))
+                    if self.gcode_relay:
+                        self._printer.commands(self.gcode_relay)
         # Disable sensor
         elif event in (
             Events.PRINT_DONE,
@@ -233,12 +231,14 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
                                                                           msg="No Filament Detected! Print Paused."))
                     self._logger.info("Pausing print.")
                     self._printer.pause_print()
+                    GPIO.remove_event_detect(self.pin)
                 if self.no_filament_gcode:
                     self._plugin_manager.send_plugin_message(self._identifier,
                                                                      dict(title="Filament Sensor", type="error", autoClose=False,
                                                                           msg="No Filament Detected! GCODE Sent."))
                     self._logger.info("Sending out of filament GCODE")
                     self._printer.commands(self.no_filament_gcode)
+                    GPIO.remove_event_detect(self.pin)
                 self.FilamentSensorOrangePiPcPlugin_confirmations_tracking = 0
         else:
             self.FilamentSensorOrangePiPcPlugin_confirmations_tracking = 0
@@ -252,6 +252,7 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
                                                                           msg="Relay Sensor Triggered!"))
             if self.gcode_relay:
                 self._printer.commands(self.gcode_relay)
+                GPIO.remove_event_detect(self.pin_relay)
             if self.send_webhook:
                 subprocess.Popen("curl -X POST -H 'Content-Type: application/json' https://maker.ifttt.com/trigger/%s/with/key/%s" % (self.ifttt_applet_name_pin2,self.ifttt_secretkey), shell=True)
                 self._logger.info("Pin 2 Sending a webhook to ifttt.")
@@ -275,7 +276,7 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
         )
 
 __plugin_name__ = "FilamentSensor OrangePiPc"
-__plugin_version__ = "2.1.19"
+__plugin_version__ = "2.1.20"
 __plugin_pythoncompat__ = ">=2.7,<4"
 
 def __plugin_check__():
