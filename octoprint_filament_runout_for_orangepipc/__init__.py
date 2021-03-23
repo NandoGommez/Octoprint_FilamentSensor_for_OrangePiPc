@@ -83,13 +83,13 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
             GPIO.setmode(GPIO.SUNXI)
             self._logger.info("Filament Sensor active on GPIO Pin [%s]"%self.pin)
             GPIO.setup(self.pin, GPIO.IN)
-        elif self.sensor_enabled_relay():
+
+        if self.sensor_enabled_relay():
             self._logger.info("Using SUNXI Mode")
             GPIO.setmode(GPIO.SUNXI)
             self._logger.info("Relay Sensor active on GPIO Pin [%s]"%self.pin_relay)
             GPIO.setup(self.pin_relay, GPIO.IN)
-        else:
-            self._logger.info("No one Pin configured, won't work unless configured!")
+
 
     def on_after_startup(self):
         self._logger.info("Filament and Relay Sensor OrangePi Pc started")
@@ -259,7 +259,7 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
         )
 
 __plugin_name__ = "FilamentSensor OrangePiPc"
-__plugin_version__ = "2.1.17"
+__plugin_version__ = "2.1.18"
 __plugin_pythoncompat__ = ">=2.7,<4"
 
 def __plugin_check__():
