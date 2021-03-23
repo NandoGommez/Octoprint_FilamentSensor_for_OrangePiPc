@@ -103,10 +103,10 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
             'switch_pin_relay':0,    # Normally Open
             'poll_time':250,  # Debounce 250ms
             'confirmations':5,# Confirm that we're actually out of filament
-            'no_filament_gcode':'',
+            'no_filament_gcode':'M600',
             'gcode_relay':'M112',
             'debug_mode':0, # Debug off!
-            'pause_print':True,
+            'pause_print':False,
             'send_webhook':False,
             'ifttt_applet_name_pin1':'',
             'ifttt_applet_name_pin2':'',
@@ -167,7 +167,9 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
                 self._plugin_manager.send_plugin_message(self._identifier,
                                                                      dict(title="Filament Sensor", type="info", autoClose=True,
                                                                           msg="Enabling Filament Sensor."))
-                GPIO.remove_event_detect(self.pin)
+                if GPIO.input(self.pin):
+                    GPIO.remove_event_detect(self.pin)
+
                 GPIO.add_event_detect(
                     self.pin, GPIO.RISING,
                     callback=self.sensor_callback,
@@ -178,7 +180,9 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
                 self._plugin_manager.send_plugin_message(self._identifier,
                                                                      dict(title="Relay Sensor", type="info", autoClose=True,
                                                                           msg="Enabling Relay Sensor."))
-                GPIO.remove_event_detect(self.pin_relay)
+                if GPIO.input(self.pin_relay): 
+                    GPIO.remove_event_detect(self.pin_relay)
+
                 GPIO.add_event_detect(
                     self.pin_relay, GPIO.RISING,
                     callback=self.sensor_callback_relay,
@@ -208,18 +212,21 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
             self.debug_only_output('Confirmations: '+str(self.FilamentSensorOrangePiPcPlugin_confirmations_tracking))
             if self.confirmations<=self.FilamentSensorOrangePiPcPlugin_confirmations_tracking:
                 self._logger.info("Out of filament!")
-                self._plugin_manager.send_plugin_message(self._identifier,
-                                                                     dict(title="Filament Sensor", type="error", autoClose=False,
-                                                                          msg="No Filament Detected! Print Paused."))
                 if self.send_webhook:
                     subprocess.Popen("curl -X POST -H 'Content-Type: application/json' https://maker.ifttt.com/trigger/%s/with/key/%s" % (self.ifttt_applet_name_pin1,self.ifttt_secretkey), shell=True)
                     self._logger.info("Pin 1 Sending a webhook to ifttt.")
                 if self.pause_print:
                     self._logger.info("Pausing print.")
                     self._printer.pause_print()
+                    self._plugin_manager.send_plugin_message(self._identifier,
+                                                                     dict(title="Filament Sensor", type="error", autoClose=False,
+                                                                          msg="No Filament Detected! Print Paused."))
                 if self.no_filament_gcode:
                     self._logger.info("Sending out of filament GCODE")
                     self._printer.commands(self.no_filament_gcode)
+                    self._plugin_manager.send_plugin_message(self._identifier,
+                                                                     dict(title="Filament Sensor", type="error", autoClose=False,
+                                                                          msg="No Filament Detected! GCODE Sent."))
                 self.FilamentSensorOrangePiPcPlugin_confirmations_tracking = 0
         else:
             self.FilamentSensorOrangePiPcPlugin_confirmations_tracking = 0
@@ -228,10 +235,12 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
         sleep(self.poll_time/1000)
         self.debug_only_output('Pin: '+str(GPIO.input(self.pin_relay)))
         if self.relay_detected():
-            self._printer.commands(self.gcode_relay)
             self._plugin_manager.send_plugin_message(self._identifier,
                                                                      dict(title="Relay Sensor", type="error", autoClose=False,
-                                                                          msg="Relay Sensor Triggered! Print Canceled."))
+                                                                          msg="Relay Sensor Triggered! GCODE Sent."))
+            if self.gcode_relay:
+                self._printer.commands(self.gcode_relay)
+
             if self.send_webhook:
                 subprocess.Popen("curl -X POST -H 'Content-Type: application/json' https://maker.ifttt.com/trigger/%s/with/key/%s" % (self.ifttt_applet_name_pin2,self.ifttt_secretkey), shell=True)
                 self._logger.info("Pin 2 Sending a webhook to ifttt.")
@@ -255,7 +264,7 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
         )
 
 __plugin_name__ = "FilamentSensor OrangePiPc"
-__plugin_version__ = "2.1.18"
+__plugin_version__ = "2.1.19"
 __plugin_pythoncompat__ = ">=2.7,<4"
 
 def __plugin_check__():
