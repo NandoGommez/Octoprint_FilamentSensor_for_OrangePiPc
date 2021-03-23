@@ -77,13 +77,14 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
     def ifttt_secretkey(self):
         return str(self._settings.get(["ifttt_secretkey"]))
 
-    def _setup_sensor(self):
+    def _setup_filament_sensor(self):
         if self.sensor_enabled():
             self._logger.info("Using SUNXI Mode")
             GPIO.setmode(GPIO.SUNXI)
             self._logger.info("Filament Sensor active on GPIO Pin [%s]"%self.pin)
             GPIO.setup(self.pin, GPIO.IN)
 
+    def _setup_relay_sensor(self):
         if self.sensor_enabled_relay():
             self._logger.info("Using SUNXI Mode")
             GPIO.setmode(GPIO.SUNXI)
@@ -92,8 +93,8 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
 
 
     def on_after_startup(self):
-        self._logger.info("Filament and Relay Sensor OrangePi Pc started")
-        self._setup_sensor()
+        self._setup_filament_sensor()
+        self._setup_relay_sensor()
 
     def get_settings_defaults(self):
         return({
@@ -119,7 +120,9 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
 
     def on_settings_save(self, data):
         octoprint.plugin.SettingsPlugin.on_settings_save(self, data)
-        self._setup_sensor()
+        GPIO.cleanup()
+        self._setup_filament_sensor()
+        self._setup_relay_sensor()
 
     def sensor_enabled(self):
         return self.pin != '-1'
@@ -142,6 +145,18 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
     def on_event(self, event, payload):
         # Early abort in case of out ot filament when start printing, as we
         # can't change with a cold nozzle
+        if GPIO.input(self.pin):
+            self.debug_only_output('Filament Sensor already ACTIVE')
+        else:
+            self._setup_filament_sensor()
+            self.debug_only_output('Activating Filament Sensor')
+        
+        if GPIO.input(self.pin_relay):
+            self.debug_only_output('Relay Sensor already ACTIVE')
+        else:
+            self._setup_relay_sensor()
+            self.debug_only_output('Activating Relay Sensor')
+
         if self.sensor_enabled():
             if event is Events.PRINT_STARTED and self.no_filament():
                 self._logger.info("Printing aborted: no filament detected!")
@@ -192,6 +207,7 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
             Events.ERROR
         ):
             self._logger.info("%s: Disabling sensors." % (event))
+            GPIO.cleanup()
 
     @octoprint.plugin.BlueprintPlugin.route("/status", methods=["GET"])
     def check_status(self):
@@ -259,7 +275,7 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
         )
 
 __plugin_name__ = "FilamentSensor OrangePiPc"
-__plugin_version__ = "2.1.18"
+__plugin_version__ = "2.1.19"
 __plugin_pythoncompat__ = ">=2.7,<4"
 
 def __plugin_check__():
