@@ -142,19 +142,20 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
     def on_event(self, event, payload):
         # Early abort in case of out ot filament when start printing, as we
         # can't change with a cold nozzle
-        if event is Events.PRINT_STARTED and self.no_filament():
-            self._logger.info("Printing aborted: no filament detected!")
-            self._plugin_manager.send_plugin_message(self._identifier,
+        if self.sensor_enabled():
+            if event is Events.PRINT_STARTED and self.no_filament():
+                self._logger.info("Printing aborted: no filament detected!")
+                self._plugin_manager.send_plugin_message(self._identifier,
                                                                      dict(type="error", autoClose=True,
                                                                           msg="No filament detected! Print aborted."))
-            self._printer.cancel_print()
-        # Early pause in case of out ot filament when resume printing
-        if event is Events.PRINT_RESUMED and self.no_filament():
-            self._logger.info("Printing aborted: no filament detected!")
-            self._plugin_manager.send_plugin_message(self._identifier,
+                self._printer.cancel_print()
+            # Early pause in case of out ot filament when resume printing
+            if event is Events.PRINT_RESUMED and self.no_filament():
+                self._logger.info("Printing aborted: no filament detected!")
+                self._plugin_manager.send_plugin_message(self._identifier,
                                                                      dict(type="error", autoClose=True,
                                                                           msg="No filament detected! Print paused."))
-            self._printer.pause_print()
+                self._printer.pause_print()
         # Enable sensor
         if event in (
             Events.PRINT_STARTED,
@@ -249,7 +250,7 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
         )
 
 __plugin_name__ = "FilamentSensor OrangePiPc"
-__plugin_version__ = "2.1.14"
+__plugin_version__ = "2.1.15"
 __plugin_pythoncompat__ = ">=2.7,<4"
 
 def __plugin_check__():
