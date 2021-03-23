@@ -55,6 +55,12 @@
         </div>
     </div>
     <div class="control-group">
+        <label class="control-label">{{ _('GCODE for trigger relay Pin 2:') }}</label>
+        <div class="controls">
+            <textarea rows="4" class="block" data-bind="value: settings.plugins.filament_runout_for_orangepipc.gcode_relay"></textarea>
+        </div>
+    </div>
+    <div class="control-group">
         <label class="control-label">{{ _('Debug Output:') }}</label>
         <div class="controls" data-toggle="tooltip" title="{{ _('Debug information out to the terminal/log.') }}">
             <select class="select-mini" data-bind="value: settings.plugins.filament_runout_for_orangepipc.debug_mode">
