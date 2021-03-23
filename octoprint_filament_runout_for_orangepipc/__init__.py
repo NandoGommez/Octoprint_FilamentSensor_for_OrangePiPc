@@ -167,7 +167,7 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
                 self._plugin_manager.send_plugin_message(self._identifier,
                                                                      dict(title="Filament Sensor", type="info", autoClose=True,
                                                                           msg="Enabling Filament Sensor."))
-                GPIO.cleanup(self.pin)
+                
                 GPIO.add_event_detect(
                     self.pin, GPIO.RISING,
                     callback=self.sensor_callback,
@@ -178,7 +178,7 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
                 self._plugin_manager.send_plugin_message(self._identifier,
                                                                      dict(title="Relay Sensor", type="info", autoClose=True,
                                                                           msg="Enabling Relay Sensor."))
-                GPIO.cleanup(self.pin_relay)
+                
                 GPIO.add_event_detect(
                     self.pin_relay, GPIO.RISING,
                     callback=self.sensor_callback_relay,
@@ -260,7 +260,7 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
         )
 
 __plugin_name__ = "FilamentSensor OrangePiPc"
-__plugin_version__ = "2.1.20"
+__plugin_version__ = "2.1.21"
 __plugin_pythoncompat__ = ">=2.7,<4"
 
 def __plugin_check__():
