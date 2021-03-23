@@ -52,6 +52,10 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
     @property
     def no_filament_gcode(self):
         return str(self._settings.get(["no_filament_gcode"])).splitlines()
+    
+    @property
+    def gcode_relay(self):
+        return str(self._settings.get(["gcode_relay"])).splitlines()
 
     @property
     def pause_print(self):
@@ -106,6 +110,7 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
             'poll_time':250,  # Debounce 250ms
             'confirmations':5,# Confirm that we're actually out of filament
             'no_filament_gcode':'',
+            'gcode_relay':'M112',
             'debug_mode':0, # Debug off!
             'pause_print':True,
             'send_webhook':False,
@@ -186,8 +191,7 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
             Events.PRINT_CANCELLED,
             Events.ERROR
         ):
-            self._logger.info("%s: Disabling filament sensor." % (event))
-            GPIO.remove_event_detect(self.pin)
+
 
     @octoprint.plugin.BlueprintPlugin.route("/status", methods=["GET"])
     def check_status(self):
@@ -224,7 +228,7 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
         sleep(self.poll_time/1000)
         self.debug_only_output('Pin: '+str(GPIO.input(self.pin_relay)))
         if self.relay_detected():
-            self._printer.cancel_print()
+            self._printer.commands(self.gcode_relay)
             self._plugin_manager.send_plugin_message(self._identifier,
                                                                      dict(type="error", autoClose=False,
                                                                           msg="Pin 2 Triggered! Print Canceled."))
@@ -251,7 +255,7 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
         )
 
 __plugin_name__ = "FilamentSensor OrangePiPc"
-__plugin_version__ = "2.1.11"
+__plugin_version__ = "2.1.12"
 __plugin_pythoncompat__ = ">=2.7,<4"
 
 def __plugin_check__():
