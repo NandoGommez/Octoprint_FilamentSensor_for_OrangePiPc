@@ -14,7 +14,7 @@ plugin_package = "octoprint_filament_runout_for_orangepipc"
 plugin_name = "FilamentSensor-OrangePiPc"
 
 # The plugin's version. Can be overwritten within OctoPrint's internal data via __plugin_version__ in the plugin module
-plugin_version = "V2.0r"
+plugin_version = "2.1.16"
 
 # The plugin's description. Can be overwritten within OctoPrint's internal data via __plugin_description__ in the plugin
 # module
