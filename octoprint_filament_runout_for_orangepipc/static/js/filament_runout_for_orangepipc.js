@@ -10,7 +10,7 @@ $(function() {
             }
 
             new PNotify({
-                title: 'FilamentSensor OrangePiPc',
+                title: data.title,
                 text: data.msg,
                 type: data.type,
                 hide: data.autoClose
