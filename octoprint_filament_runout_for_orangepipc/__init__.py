@@ -14,7 +14,6 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
                              octoprint.plugin.TemplatePlugin,
                              octoprint.plugin.SettingsPlugin,
                              octoprint.plugin.AssetPlugin,
-                             octoprint.plugin.SimpleApiPlugin,
                              octoprint.plugin.RestartNeedingPlugin):
 
     def initialize(self):
@@ -27,12 +26,20 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
         return str(self._settings.get(["pin"]))
 
     @property
-    def poll_time(self):
-        return int(self._settings.get(["poll_time"]))
-
-    @property
     def switch(self):
         return int(self._settings.get(["switch"]))
+
+    @property
+    def pin_relay(self):
+        return str(self._settings.get(["pin_relay"]))
+
+    @property
+    def switch_pin_relay(self):
+        return int(self._settings.get(["switch_pin_relay"]))
+
+    @property
+    def poll_time(self):
+        return int(self._settings.get(["poll_time"]))
 
     @property
     def confirmations(self):
@@ -55,53 +62,55 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
         return self._settings.get_boolean(["send_webhook"])
 
     @property
-    def ifttt_applet_name(self):
-        return str(self._settings.get(["ifttt_applet_name"]))
+    def ifttt_applet_name_pin1(self):
+        return str(self._settings.get(["ifttt_applet_name_pin1"]))
+
+    @property
+    def ifttt_applet_name_pin2(self):
+        return str(self._settings.get(["ifttt_applet_name_pin2"]))
 
     @property
     def ifttt_secretkey(self):
         return str(self._settings.get(["ifttt_secretkey"]))
 
     def _setup_sensor(self):
-        if self.sensor_enabled():
+        if self.sensor_enabled() and self.sensor_enabled_relay():
+            self._logger.info("Using SUNXI Mode")
+            GPIO.setmode(GPIO.SUNXI)
+            self._logger.info("Both Sensor active on GPIO Pin [%s] and [%s]"%self.pin,self.pin_relay)
+            chan_list = [self.pin,self.pin_relay]
+            GPIO.setup(chan_list, GPIO.IN)
+        elif self.sensor_enabled():
             self._logger.info("Using SUNXI Mode")
             GPIO.setmode(GPIO.SUNXI)
             self._logger.info("Filament Sensor active on GPIO Pin [%s]"%self.pin)
             GPIO.setup(self.pin, GPIO.IN)
+        elif self.sensor_enabled_relay():
+            self._logger.info("Using SUNXI Mode")
+            GPIO.setmode(GPIO.SUNXI)
+            self._logger.info("Relay Sensor active on GPIO Pin [%s]"%self.pin_relay)
+            GPIO.setup(self.pin_relay, GPIO.IN)
         else:
-            self._logger.info("Pin not configured, won't work unless configured!")
+            self._logger.info("No one Pin configured, won't work unless configured!")
 
     def on_after_startup(self):
         self._logger.info("FilamentSensor-OrangePiPc started")
         self._setup_sensor()
 
-    def get_api_commands(self):
-        return dict(getFilamentState=[])
-
-    def on_api_get(self, request):
-        return self.on_api_command("getFilamentState", [])
-
-    def on_api_command(self, command, data):
-        if not user_permission.can():
-            return make_response("Insufficient rights", 403)
-        
-        if command == 'getFilamentState':
-			if GPIO.input(self.pin) == self.switch:
-				return jsonify(isFilamentOn=False)
-			else:
-				return jsonify(isFilamentOn=True)
-
     def get_settings_defaults(self):
         return({
             'pin':'-1',   # Default is no pin
-            'poll_time':250,  # Debounce 250ms
             'switch':0,    # Normally Open
+            'pin_relay':'-1',   # Default is no pin
+            'switch_pin_relay':0,    # Normally Open
+            'poll_time':250,  # Debounce 250ms
             'confirmations':5,# Confirm that we're actually out of filament
             'no_filament_gcode':'',
             'debug_mode':0, # Debug off!
             'pause_print':True,
             'send_webhook':False,
-            'ifttt_applet_name':'',
+            'ifttt_applet_name_pin1':'',
+            'ifttt_applet_name_pin2':'',
             'ifttt_secretkey':''
         })
     
@@ -116,16 +125,17 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
     def sensor_enabled(self):
         return self.pin != '-1'
 
+    def sensor_enabled_relay(self):
+        return self.pin_relay != '-1'
+
     def no_filament(self):
         return GPIO.input(self.pin) == self.switch
 
-    def get_assets(self):
-        return {
-            "js": ["js/filament_runout_for_orangepipc.js"],
-            "less": ["less/filament_runout_for_orangepipc.less"],
-            "css": ["css/filament_runout_for_orangepipc.min.css"]
+    def relay_detected(self):
+        return GPIO.input(self.pin_relay) == self.switch_pin_relay
 
-        }
+    def get_assets(self):
+        return dict(js=["js/filament_runout_for_orangepipc.js"])
 
     def get_template_configs(self):
         return [dict(type="settings", custom_bindings=False)]
@@ -155,12 +165,18 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
             self._plugin_manager.send_plugin_message(self._identifier,
                                                                      dict(type="info", autoClose=True,
                                                                           msg="Enabling filament sensor."))
-            self._plugin_manager.send_plugin_message(self._identifier, dict(isFilamentOn=True))
             if self.sensor_enabled():
                 GPIO.remove_event_detect(self.pin)
                 GPIO.add_event_detect(
                     self.pin, GPIO.RISING,
                     callback=self.sensor_callback,
+                    bouncetime=self.poll_time
+                )
+            if self.sensor_enabled_relay():
+                GPIO.remove_event_detect(self.pin_relay)
+                GPIO.add_event_detect(
+                    self.pin_relay, GPIO.RISING,
+                    callback=self.sensor_callback_relay,
                     bouncetime=self.poll_time
                 )
         # Disable sensor
@@ -189,14 +205,13 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
             if self.confirmations<=self.FilamentSensorOrangePiPcPlugin_confirmations_tracking:
                 self._logger.info("Out of filament!")
                 if self.send_webhook:
-                    subprocess.Popen("curl -X POST -H 'Content-Type: application/json' https://maker.ifttt.com/trigger/%s/with/key/%s" % (self.ifttt_applet_name,self.ifttt_secretkey), shell=True)
+                    subprocess.Popen("curl -X POST -H 'Content-Type: application/json' https://maker.ifttt.com/trigger/%s/with/key/%s" % (self.ifttt_applet_name_pin1,self.ifttt_secretkey), shell=True)
                     self._logger.info("Sending a webhook to ifttt.")
                 if self.pause_print:
                     self._logger.info("Pausing print.")
                     self._plugin_manager.send_plugin_message(self._identifier,
                                                                      dict(type="error", autoClose=False,
                                                                           msg="No filament detected! Print paused."))
-                    self._plugin_manager.send_plugin_message(self._identifier, dict(isFilamentOn=False))
                     self._printer.pause_print()
                 if self.no_filament_gcode:
                     self._logger.info("Sending out of filament GCODE")
@@ -205,6 +220,14 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
         else:
             self.FilamentSensorOrangePiPcPlugin_confirmations_tracking = 0
     
+    def sensor_callback_relay(self, _):
+        sleep(self.poll_time/1000)
+        self.debug_only_output('Pin: '+str(GPIO.input(self.pin_relay)))
+        if self.relay_detected():
+            if self.send_webhook:
+                subprocess.Popen("curl -X POST -H 'Content-Type: application/json' https://maker.ifttt.com/trigger/%s/with/key/%s" % (self.ifttt_applet_name_pin2,self.ifttt_secretkey), shell=True)
+                self._logger.info("Sending a webhook to ifttt.")
+                self._printer.cancel_print()
 
     def get_update_information(self):
         return dict(
@@ -224,7 +247,7 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
         )
 
 __plugin_name__ = "FilamentSensor OrangePiPc"
-__plugin_version__ = "2.1.11e"
+__plugin_version__ = "2.1.10"
 __plugin_pythoncompat__ = ">=2.7,<4"
 
 def __plugin_check__():
