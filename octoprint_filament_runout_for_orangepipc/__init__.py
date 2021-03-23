@@ -78,13 +78,7 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
         return str(self._settings.get(["ifttt_secretkey"]))
 
     def _setup_sensor(self):
-        if self.sensor_enabled() and self.sensor_enabled_relay():
-            self._logger.info("Using SUNXI Mode")
-            GPIO.setmode(GPIO.SUNXI)
-            self._logger.info("Both Pin activated")
-            chan_list = [self.pin,self.pin_relay]
-            GPIO.setup(chan_list, GPIO.IN)
-        elif self.sensor_enabled():
+        if self.sensor_enabled():
             self._logger.info("Using SUNXI Mode")
             GPIO.setmode(GPIO.SUNXI)
             self._logger.info("Filament Sensor active on GPIO Pin [%s]"%self.pin)
@@ -208,11 +202,11 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
             self.debug_only_output('Confirmations: '+str(self.FilamentSensorOrangePiPcPlugin_confirmations_tracking))
             if self.confirmations<=self.FilamentSensorOrangePiPcPlugin_confirmations_tracking:
                 self._logger.info("Out of filament!")
-                if self.send_webhook:
-                    subprocess.Popen("curl -X POST -H 'Content-Type: application/json' https://maker.ifttt.com/trigger/%s/with/key/%s" % (self.ifttt_applet_name_pin1,self.ifttt_secretkey), shell=True)
-                    self._plugin_manager.send_plugin_message(self._identifier,
+                self._plugin_manager.send_plugin_message(self._identifier,
                                                                      dict(type="error", autoClose=False,
                                                                           msg="No filament detected! Print paused."))
+                if self.send_webhook:
+                    subprocess.Popen("curl -X POST -H 'Content-Type: application/json' https://maker.ifttt.com/trigger/%s/with/key/%s" % (self.ifttt_applet_name_pin1,self.ifttt_secretkey), shell=True)
                     self._logger.info("Pin 1 Sending a webhook to ifttt.")
                 if self.pause_print:
                     self._logger.info("Pausing print.")
@@ -255,7 +249,7 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
         )
 
 __plugin_name__ = "FilamentSensor OrangePiPc"
-__plugin_version__ = "2.1.13"
+__plugin_version__ = "2.1.14"
 __plugin_pythoncompat__ = ">=2.7,<4"
 
 def __plugin_check__():
