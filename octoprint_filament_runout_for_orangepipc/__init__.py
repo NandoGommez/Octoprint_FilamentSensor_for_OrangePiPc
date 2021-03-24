@@ -170,24 +170,24 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
 																		  msg="Enabling Relay Sensor."))
 
 		elif event is Events.PRINT_RESUMED:
+			# Prevent resume print when Filament Sensor is Triggered
 			if self.filament_send_alert:
 				self._plugin_manager.send_plugin_message(self._identifier,
 																	 dict(title="Filament Sensor", type="error", autoClose=True,
 																		  msg="Filament Sensor Triggered! Print paused."))
 				self._printer.pause_print()
 				self.print_started = False
-				self.filament_send_alert = False
 			else:
 				self.print_started = True
 				self.filament_send_alert = False
 			
+			# Prevent resume print when Relay Sensor is Triggered
 			if self.relay_send_alert:
 				self._plugin_manager.send_plugin_message(self._identifier,
 																	 dict(title="Relay Sensor", type="error", autoClose=True,
 																		  msg="Relay Sensor Triggered! Print paused."))
 				self._printer.pause_print()
 				self.print_started = False
-				self.relay_send_alert = False
 			else:
 				self.print_started = True
 				self.relay_send_alert = False
@@ -287,7 +287,7 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
 		)
 
 __plugin_name__ = "FilamentSensor OrangePiPc"
-__plugin_version__ = "2.1.24"
+__plugin_version__ = "2.1.25"
 __plugin_pythoncompat__ = ">=2.7,<4"
 
 def __plugin_check__():
