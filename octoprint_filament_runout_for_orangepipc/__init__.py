@@ -237,10 +237,11 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
 				if self.no_filament_gcode:
 					self.debug_only_output("Sending Filament Sensor GCODE")
 					self._printer.commands(self.no_filament_gcode)
-				self.filament_send_alert_count = 0
 				break
+				self.filament_send_alert_count = 0
 		else:
 			self.filament_send_alert = False
+			self.filament_send_alert_count = 0
 
 	def relay_sensor_callback(self, _):
 		while GPIO.input(self.pin_relay) == self.switch_pin_relay:
@@ -262,10 +263,11 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
 				if self.gcode_relay:
 					self.debug_only_output("Sending Relay Sensor GCODE")
 					self._printer.commands(self.gcode_relay)
-				self.relay_send_alert_count = 0
 				break
+				self.relay_send_alert_count = 0
 		else:
 			self.relay_send_alert = False
+			self.relay_send_alert_count = 0
 
 	def get_update_information(self):
 		return dict(
@@ -285,7 +287,7 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
 		)
 
 __plugin_name__ = "FilamentSensor OrangePiPc"
-__plugin_version__ = "2.1.23"
+__plugin_version__ = "2.1.24"
 __plugin_pythoncompat__ = ">=2.7,<4"
 
 def __plugin_check__():
