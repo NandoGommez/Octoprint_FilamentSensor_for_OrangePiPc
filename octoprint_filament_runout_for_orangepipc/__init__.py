@@ -223,23 +223,22 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
 			self.filament_send_alert_count+=1
 			self.debug_only_output('Confirmations: '+str(self.filament_send_alert_count))
 			if self.confirmations<=self.filament_send_alert_count:
+				self.filament_send_alert = True
 				self.filament_send_alert_count = 0
-				if filament_send_alert:
-					self._logger.info("Filament Sensor Triggered!")
-					self._plugin_manager.send_plugin_message(self._identifier,
+				self._logger.info("Filament Sensor Triggered!")
+				self._plugin_manager.send_plugin_message(self._identifier,
 																	 dict(title="Filament Sensor", type="error", autoClose=False,
 																		  msg="No Filament Detected!"))
-					if self.send_webhook:
-						subprocess.Popen("curl -X POST -H 'Content-Type: application/json' https://maker.ifttt.com/trigger/%s/with/key/%s" % (self.ifttt_applet_name_pin1,self.ifttt_secretkey), shell=True)
-						self.debug_only_output("Pin 1 Sending a webhook to ifttt.")
-					if self.pause_print:
-						self.debug_only_output("Pausing print.")
-						self._printer.pause_print()
-					if self.no_filament_gcode:
-						self.debug_only_output("Sending Filament Sensor GCODE")
-						self._printer.commands(self.no_filament_gcode)
+				if self.send_webhook:
+					subprocess.Popen("curl -X POST -H 'Content-Type: application/json' https://maker.ifttt.com/trigger/%s/with/key/%s" % (self.ifttt_applet_name_pin1,self.ifttt_secretkey), shell=True)
+					self.debug_only_output("Pin 1 Sending a webhook to ifttt.")
+				if self.pause_print:
+					self.debug_only_output("Pausing print.")
+					self._printer.pause_print()
+				if self.no_filament_gcode:
+					self.debug_only_output("Sending Filament Sensor GCODE")
+					self._printer.commands(self.no_filament_gcode)
 				break
-			self.filament_send_alert = True
 		else:
 			self.filament_send_alert = False
 			self.filament_send_alert_count = 0
@@ -250,23 +249,22 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
 			self.debug_only_output('Confirmations: '+str(self.relay_send_alert_count))
 			sleep(self.poll_time/1000)
 			if self.confirmations<=self.relay_send_alert_count:
+				self.relay_send_alert = True
 				self.relay_send_alert_count = 0
-				if relay_send_alert:
-					self._logger.info("Relay Sensor Triggered!")
-					self._plugin_manager.send_plugin_message(self._identifier,
+				self._logger.info("Relay Sensor Triggered!")
+				self._plugin_manager.send_plugin_message(self._identifier,
 																	 dict(title="Relay Sensor", type="error", autoClose=False,
 																		  msg="Relay Sensor Triggered!"))
-					if self.send_webhook:
-						subprocess.Popen("curl -X POST -H 'Content-Type: application/json' https://maker.ifttt.com/trigger/%s/with/key/%s" % (self.ifttt_applet_name_pin2,self.ifttt_secretkey), shell=True)
-						self.debug_only_output("Pin 2 Sending a webhook to ifttt.")
-					if self.pause_print:
-						self.debug_only_output("Pausing print.")
-						self._printer.pause_print()
-					if self.gcode_relay:
-						self.debug_only_output("Sending Relay Sensor GCODE")
-						self._printer.commands(self.gcode_relay)
+				if self.send_webhook:
+					subprocess.Popen("curl -X POST -H 'Content-Type: application/json' https://maker.ifttt.com/trigger/%s/with/key/%s" % (self.ifttt_applet_name_pin2,self.ifttt_secretkey), shell=True)
+					self.debug_only_output("Pin 2 Sending a webhook to ifttt.")
+				if self.pause_print:
+					self.debug_only_output("Pausing print.")
+					self._printer.pause_print()
+				if self.gcode_relay:
+					self.debug_only_output("Sending Relay Sensor GCODE")
+					self._printer.commands(self.gcode_relay)
 				break
-			self.relay_send_alert = True
 		else:
 			self.relay_send_alert = False
 			self.relay_send_alert_count = 0
@@ -289,7 +287,7 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
 		)
 
 __plugin_name__ = "FilamentSensor OrangePiPc"
-__plugin_version__ = "2.1.27"
+__plugin_version__ = "2.1.26"
 __plugin_pythoncompat__ = ">=2.7,<4"
 
 def __plugin_check__():
