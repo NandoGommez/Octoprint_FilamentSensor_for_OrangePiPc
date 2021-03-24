@@ -150,7 +150,7 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
                                                                           msg="Enabling Filament Sensor."))
                 self._setup_filament_sensor()
                 GPIO.add_event_detect(
-                    self.pin, GPIO.BOTH,
+                    self.pin, GPIO.RISING,
                     callback=self.sensor_callback,
                     bouncetime=self.poll_time
                 )
@@ -163,7 +163,7 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
                                                                           msg="Enabling Relay Sensor."))
                 self._setup_relay_sensor()
                 GPIO.add_event_detect(
-                    self.pin_relay, GPIO.BOTH,
+                    self.pin_relay, GPIO.RISING,
                     callback=self.sensor_callback_relay,
                     bouncetime=self.poll_time
                 )
@@ -174,7 +174,7 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
             if self.sensor_enabled():
                 GPIO.remove_event_detect(self.pin)
                 GPIO.add_event_detect(
-                    self.pin, GPIO.BOTH,
+                    self.pin, GPIO.RISING,
                     callback=self.sensor_callback,
                     bouncetime=self.poll_time
                 )
@@ -189,7 +189,7 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
             if self.sensor_enabled_relay():
                 GPIO.remove_event_detect(self.pin_relay)
                 GPIO.add_event_detect(
-                    self.pin_relay, GPIO.BOTH,
+                    self.pin_relay, GPIO.RISING,
                     callback=self.sensor_callback_relay,
                     bouncetime=self.poll_time
                 )
@@ -274,7 +274,7 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
         )
 
 __plugin_name__ = "FilamentSensor OrangePiPc"
-__plugin_version__ = "2.1.21"
+__plugin_version__ = "2.1.22"
 __plugin_pythoncompat__ = ">=2.7,<4"
 
 def __plugin_check__():
