@@ -220,6 +220,27 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
 		return [dict(type="settings", custom_bindings=False)]
 
 	def on_event(self, event, payload):
+		
+		while event is Events.PRINT_STARTED:
+			if self.relay_auto1_enabled():
+				GPIO.output(self.pin_relay_auto1, GPIO.LOW)
+				if self.relay_auto1_timeon_enabled():
+					sleep(self.relay_auto1_timeon)
+				if self.relay_auto1_timeout_enabled():
+					GPIO.output(self.pin_relay_auto1, GPIO.HIGH)
+					sleep(self.relay_auto1_timeout)
+			if self.relay_auto2_enabled():
+				GPIO.output(self.pin_relay_auto2, GPIO.LOW)
+				if self.relay_auto2_timeon_enabled():
+					sleep(self.relay_auto2_timeon)
+				if self.relay_auto2_timeout_enabled():
+					GPIO.output(self.pin_relay_auto2, GPIO.HIGH)
+					sleep(self.relay_auto2_timeout)
+			if self.print_started == False:
+				GPIO.output(self.pin_relay_auto1, GPIO.HIGH)
+				GPIO.output(self.pin_relay_auto2, GPIO.HIGH)
+				break
+
 		if event is Events.PRINT_STARTED:
 			self.print_started = True
 			if self.filament_sensor_enabled():
@@ -259,6 +280,7 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
 		elif event in (
 			Events.PRINT_DONE,
 			Events.PRINT_FAILED,
+			Events.PRINT_CANCELLING,
 			Events.PRINT_CANCELLED,
 			Events.ERROR
 		):
@@ -275,28 +297,7 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
 		elif event is Events.Z_CHANGE:
 			if(self.print_started):	 
 				# Set print_started to False to prevent that the starting command is called multiple times
-				self.print_started = False
-
-		while self.print_started == True:
-			if self.on_printing():
-				if self.relay_auto1_enabled():
-					GPIO.output(self.pin_relay_auto1, GPIO.LOW)
-					if self.relay_auto1_timeon_enabled():
-						sleep(self.relay_auto1_timeon)
-					if self.relay_auto1_timeout_enabled():
-						GPIO.output(self.pin_relay_auto1, GPIO.HIGH)
-						sleep(self.relay_auto1_timeout)
-
-				if self.relay_auto2_enabled():
-					GPIO.output(self.pin_relay_auto2, GPIO.LOW)
-					if self.relay_auto2_timeon_enabled():
-						sleep(self.relay_auto2_timeon)
-					if self.relay_auto2_timeout_enabled():
-						GPIO.output(self.pin_relay_auto2, GPIO.HIGH)
-						sleep(self.relay_auto2_timeout)
-			else:
-				GPIO.cleanup( (self.pin_relay_auto1, self.pin_relay_auto2) )
-				break	 
+				self.print_started = False	 
 
 	@octoprint.plugin.BlueprintPlugin.route("/status", methods=["GET"])
 	def check_status(self):
@@ -375,7 +376,7 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
 		)
 
 __plugin_name__ = "FilamentSensor OrangePiPc"
-__plugin_version__ = "2.1.42"
+__plugin_version__ = "2.1.43"
 __plugin_pythoncompat__ = ">=2.7,<4"
 
 def __plugin_check__():
