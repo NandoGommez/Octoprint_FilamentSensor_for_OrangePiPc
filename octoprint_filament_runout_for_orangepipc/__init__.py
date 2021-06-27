@@ -136,13 +136,13 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
 		if self.relay_auto1_enabled():
 			self._logger.info("Relay Automation 1 active on GPIO Pin [%s]"%self.pin_relay)
 			GPIO.setup(self.pin_relay_auto1, GPIO.OUT)
-			#GPIO.output(self.pin_relay_auto1, GPIO.LOW)
+			GPIO.output(self.pin_relay_auto1, GPIO.HIGH)
 
 		# Enable Relay Auto 2
 		if self.relay_auto2_enabled():
 			self._logger.info("Relay Automation 2 active on GPIO Pin [%s]"%self.pin_relay)
 			GPIO.setup(self.pin_relay_auto2, GPIO.OUT)
-			#GPIO.output(self.pin_relay_auto2, GPIO.LOW)
+			GPIO.output(self.pin_relay_auto2, GPIO.HIGH)
 
 	def on_after_startup(self):
 		self._logger.info("Filament and Relay Sensor Started")
@@ -230,7 +230,7 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
 																	 dict(title="Relay Sensor", type="info", autoClose=True,
 																		  msg="Enabling Relay Sensor."))
 
-			while True:
+			while self.print_started == True:
 				if self.relay_auto1_enabled():
 					GPIO.output(self.pin_relay_auto1, GPIO.HIGH)
 					if self.relay_auto1_timeon_enabled():
@@ -365,7 +365,7 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
 		)
 
 __plugin_name__ = "FilamentSensor OrangePiPc"
-__plugin_version__ = "2.1.34"
+__plugin_version__ = "2.1.35"
 __plugin_pythoncompat__ = ">=2.7,<4"
 
 def __plugin_check__():
