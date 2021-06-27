@@ -27,12 +27,32 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
 		self.relay_send_alert_count = 0
 
 	@property
-	def pin_relay_test(self):
-		return str("PA8")
-
-	@property
 	def pin(self):
 		return str(self._settings.get(["pin"]))
+
+	@property
+	def pin_relay_auto1(self):
+		return str(self._settings.get(["pin_relay_auto1"]))
+
+	@property
+	def pin_relay_auto2(self):
+		return str(self._settings.get(["pin_relay_auto2"]))
+
+	@property
+	def relay_auto1_timeon(self):
+		return str(self._settings.get(["relay_auto1_timeon"]))
+
+	@property
+	def relay_auto1_timeout(self):
+		return str(self._settings.get(["relay_auto1_timeout"]))
+
+	@property
+	def relay_auto2_timeon(self):
+		return str(self._settings.get(["relay_auto2_timeon"]))
+
+	@property
+	def relay_auto2_timeout(self):
+		return str(self._settings.get(["relay_auto2_timeout"]))
 
 	@property
 	def switch(self):
@@ -94,7 +114,6 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
 		if self.filament_sensor_enabled():
 			self._logger.info("Filament Sensor active on GPIO Pin [%s]"%self.pin)
 			GPIO.setup(self.pin, GPIO.IN)
-			GPIO.setup(self.pin_relay_test, GPIO.OUT)
 			try:
 				GPIO.remove_event_detect(self.pin)
 			except:
@@ -112,7 +131,19 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
 				self._logger.info("Pin " + str(self.pin_relay) + " not used before")
 
 			GPIO.add_event_detect(self.pin_relay, GPIO.BOTH, callback=self.relay_sensor_callback, bouncetime=self.poll_time)
-		
+
+		# Enable Relay Auto 1
+		if self.relay_auto1_enabled():
+			self._logger.info("Relay Automation 1 active on GPIO Pin [%s]"%self.pin_relay)
+			GPIO.setup(self.pin_relay_auto1, GPIO.OUT)
+			GPIO.output(self.pin_relay_auto1, GPIO.LOW)
+
+		# Enable Relay Auto 2
+		if self.relay_auto2_enabled():
+			self._logger.info("Relay Automation 2 active on GPIO Pin [%s]"%self.pin_relay)
+			GPIO.setup(self.pin_relay_auto2, GPIO.OUT)
+			GPIO.output(self.pin_relay_auto2, GPIO.LOW)
+
 	def on_after_startup(self):
 		self._logger.info("Filament and Relay Sensor Started")
 		self._setup_sensor()
@@ -149,6 +180,24 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
 	def relay_sensor_enabled(self):
 		return self.pin_relay != '-1'
 
+	def relay_auto1_enabled(self):
+		return self.pin_relay_auto1 != '-1'
+
+	def relay_auto2_enabled(self):
+		return self.pin_relay_auto2 != '-1'
+
+	def relay_auto1_timeon_enabled(self):
+		return self.relay_auto1_timeon != '-1'
+
+	def relay_auto1_timeout_enabled(self):
+		return self.relay_auto1_timeout != '-1'
+
+	def relay_auto2_timeon_enabled(self):
+		return self.relay_auto2_timeon != '-1'
+
+	def relay_auto2_timeout_enabled(self):
+		return self.relay_auto2_timeout != '-1'
+
 	def no_filament(self):
 		return GPIO.input(self.pin) == self.switch
 
@@ -175,11 +224,23 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
 																	 dict(title="Relay Sensor", type="info", autoClose=True,
 																		  msg="Enabling Relay Sensor."))
 
-			while True:
-				GPIO.output(self.pin_relay_test, GPIO.HIGH)
-				sleep(60)
-				GPIO.output(self.pin_relay_test, GPIO.LOW)
-				sleep(60)
+			if self.relay_auto1_enabled():
+				while True:
+					GPIO.output(self.pin_relay_auto1, GPIO.HIGH)
+					if self.relay_auto1_timeon_enabled():
+						sleep(self.relay_auto1_timeon)
+					if self.relay_auto1_timeout_enabled():
+						GPIO.output(self.pin_relay_auto1, GPIO.LOW)
+						sleep(self.relay_auto1_timeout)
+
+			if self.relay_auto2_enabled():
+				while True:
+					GPIO.output(self.pin_relay_auto2, GPIO.HIGH)
+					if self.relay_auto2_timeon_enabled():
+						sleep(self.relay_auto2_timeon)
+					if self.relay_auto2_timeout_enabled():
+						GPIO.output(self.pin_relay_auto2, GPIO.LOW)
+						sleep(self.relay_auto2_timeout)
 
 		elif event is Events.PRINT_RESUMED:
 			# Prevent resume print when Filament Sensor is Triggered
@@ -299,7 +360,7 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
 		)
 
 __plugin_name__ = "FilamentSensor OrangePiPc"
-__plugin_version__ = "2.1.30"
+__plugin_version__ = "2.1.31"
 __plugin_pythoncompat__ = ">=2.7,<4"
 
 def __plugin_check__():
