@@ -170,7 +170,6 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
 				self._plugin_manager.send_plugin_message(self._identifier,
 																	 dict(title="Relay Sensor", type="info", autoClose=True,
 																		  msg="Enabling Relay Sensor."))
-			while True: # Run forever
 				GPIO.output("PA8", GPIO.HIGH) # Turn on
 				sleep(60) # Sleep for 1 second
 				GPIO.output("PA8", GPIO.LOW) # Turn off
