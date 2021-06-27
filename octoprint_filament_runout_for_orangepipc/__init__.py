@@ -350,6 +350,7 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
 	def _setup_relays(self):
 		while True:
 			self._logger.info("Test1!")
+			self._logger.info(self.print_started_relays)
 			if self.print_started_relays == True and self.relay_auto1_enabled():
 				self._logger.info("Test2!")
 				GPIO.output(self.pin_relay_auto1, GPIO.LOW)
@@ -368,9 +369,8 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
 					GPIO.output(self.pin_relay_auto2, GPIO.HIGH)
 					sleep(self.relay_auto2_timeout)
 
-			if event in (Events.PRINT_DONE,Events.PRINT_FAILED,Events.PRINT_CANCELLING,Events.PRINT_CANCELLED,Events.ERROR):
+			if self.print_started_relays == False:
 				self._logger.info("Test4!")
-				self.print_started_relays = False
 				GPIO.output(self.pin_relay_auto1, GPIO.HIGH)
 				GPIO.output(self.pin_relay_auto2, GPIO.HIGH)
 				break
@@ -393,7 +393,7 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
 		)
 
 __plugin_name__ = "FilamentSensor OrangePiPc"
-__plugin_version__ = "2.1.54"
+__plugin_version__ = "2.1.55"
 __plugin_pythoncompat__ = ">=2.7,<4"
 
 def __plugin_check__():
