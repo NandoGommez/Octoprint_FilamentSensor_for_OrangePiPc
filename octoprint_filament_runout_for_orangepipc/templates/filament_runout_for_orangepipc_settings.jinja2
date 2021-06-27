@@ -76,6 +76,50 @@
             </label>
         </div>
     </div>
+<h4>{{ _('Relays and Automation') }}</h4>
+    
+    <div class="control-group">
+        <label class="control-label">{{ _('Pin: Relay Auto 1') }}</label>
+        <div class="controls" title="{{ _('Which Orange Pi GPIO pin your switch is attached to (-1 disables)') }}">
+            <input type="text" class="input-mini text-right" data-bind="value: settings.plugins.filament_runout_for_orangepipc.pin_relay_auto1">
+        </div>
+    </div>
+
+    <div class="control-group">
+        <label class="control-label">{{ _('Time On for Relay Auto 1') }}</label>
+        <div class="controls" title="{{ _('Time in MS (-1 disables)') }}">
+            <input type="text" class="input-mini text-right" data-bind="value: settings.plugins.filament_runout_for_orangepipc.relay_auto1_timeon">
+        </div>
+    </div>
+
+    <div class="control-group">
+        <label class="control-label">{{ _('Time Out for Relay Auto 1') }}</label>
+        <div class="controls" title="{{ _('Time in MS (-1 disables)') }}">
+            <input type="text" class="input-mini text-right" data-bind="value: settings.plugins.filament_runout_for_orangepipc.relay_auto1_timeout">
+        </div>
+    </div>
+
+    <div class="control-group">
+        <label class="control-label">{{ _('Pin: Relay Auto 2') }}</label>
+        <div class="controls" title="{{ _('Which Orange Pi GPIO pin your switch is attached to (-1 disables)') }}">
+            <input type="text" class="input-mini text-right" data-bind="value: settings.plugins.filament_runout_for_orangepipc.pin_relay_auto2">
+        </div>
+    </div>
+
+    <div class="control-group">
+        <label class="control-label">{{ _('Time On for Relay Auto 2') }}</label>
+        <div class="controls" title="{{ _('Time in MS (-1 disables)') }}">
+            <input type="text" class="input-mini text-right" data-bind="value: settings.plugins.filament_runout_for_orangepipc.relay_auto2_timeon">
+        </div>
+    </div>
+
+    <div class="control-group">
+        <label class="control-label">{{ _('Time Out for Relay Auto 2') }}</label>
+        <div class="controls" title="{{ _('Time in MS (-1 disables)') }}">
+            <input type="text" class="input-mini text-right" data-bind="value: settings.plugins.filament_runout_for_orangepipc.relay_auto2_timeout">
+        </div>
+    </div>
+
 <h4>{{ _('Webhook Configuration') }}</h4>
     <div class="control-group">
         <div class="controls" data-toggle="tooltip" title="{{ _('Send a webhook to IFTTT') }}">
