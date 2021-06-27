@@ -151,6 +151,12 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
 	def get_settings_defaults(self):
 		return({
 			'pin':'-1',   # Default is no pin
+			'pin_relay_auto1':'-1',   # Default is no pin
+			'pin_relay_auto2':'-1',   # Default is no pin
+			'relay_auto1_timeon':'-1',   # Default is no pin
+			'relay_auto1_timeout':'-1',   # Default is no pin
+			'relay_auto2_timeon':'-1',   # Default is no pin
+			'relay_auto2_timeout':'-1',   # Default is no pin
 			'switch':0,	# Normally Open
 			'pin_relay':'-1',   # Default is no pin
 			'switch_pin_relay':0,	# Normally Open
@@ -224,8 +230,8 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
 																	 dict(title="Relay Sensor", type="info", autoClose=True,
 																		  msg="Enabling Relay Sensor."))
 
-			if self.relay_auto1_enabled():
-				while True:
+			while True:
+				if self.relay_auto1_enabled():
 					GPIO.output(self.pin_relay_auto1, GPIO.HIGH)
 					if self.relay_auto1_timeon_enabled():
 						sleep(self.relay_auto1_timeon)
@@ -233,8 +239,7 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
 						GPIO.output(self.pin_relay_auto1, GPIO.LOW)
 						sleep(self.relay_auto1_timeout)
 
-			if self.relay_auto2_enabled():
-				while True:
+				if self.relay_auto2_enabled():
 					GPIO.output(self.pin_relay_auto2, GPIO.HIGH)
 					if self.relay_auto2_timeon_enabled():
 						sleep(self.relay_auto2_timeon)
@@ -360,7 +365,7 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
 		)
 
 __plugin_name__ = "FilamentSensor OrangePiPc"
-__plugin_version__ = "2.1.31"
+__plugin_version__ = "2.1.32"
 __plugin_pythoncompat__ = ">=2.7,<4"
 
 def __plugin_check__():
