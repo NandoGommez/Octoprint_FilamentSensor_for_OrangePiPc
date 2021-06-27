@@ -85,6 +85,7 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
 	def _setup_sensor(self):
 		GPIO.cleanup()
 		GPIO.setmode(GPIO.SUNXI)
+		GPIO.setup("PA8", GPIO.OUT)
 		# Enable Filament Sensor
 		if self.filament_sensor_enabled():
 			self._logger.info("Filament Sensor active on GPIO Pin [%s]"%self.pin)
@@ -168,6 +169,11 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
 				self._plugin_manager.send_plugin_message(self._identifier,
 																	 dict(title="Relay Sensor", type="info", autoClose=True,
 																		  msg="Enabling Relay Sensor."))
+			while True: # Run forever
+				GPIO.output("PA8", GPIO.HIGH) # Turn on
+				sleep(60) # Sleep for 1 second
+				GPIO.output("PA8", GPIO.LOW) # Turn off
+ 				sleep(60) # Sleep for 1 second
 
 		elif event is Events.PRINT_RESUMED:
 			# Prevent resume print when Filament Sensor is Triggered
