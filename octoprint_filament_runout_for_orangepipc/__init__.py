@@ -349,27 +349,31 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
 
 	def _setup_relays(self):
 		while True:
-				if self.print_started_relays == True and self.relay_auto1_enabled():
-					GPIO.output(self.pin_relay_auto1, GPIO.LOW)
-					if self.relay_auto1_timeon_enabled():
-						sleep(self.relay_auto1_timeon)
-					if self.relay_auto1_timeout_enabled():
-						GPIO.output(self.pin_relay_auto1, GPIO.HIGH)
-						sleep(self.relay_auto1_timeout)
-
-				if self.print_started_relays == True and self.relay_auto2_enabled():
-					GPIO.output(self.pin_relay_auto2, GPIO.LOW)
-					if self.relay_auto2_timeon_enabled():
-						sleep(self.relay_auto2_timeon)
-					if self.relay_auto2_timeout_enabled():
-						GPIO.output(self.pin_relay_auto2, GPIO.HIGH)
-						sleep(self.relay_auto2_timeout)
-
-				if event in (Events.PRINT_DONE,Events.PRINT_FAILED,Events.PRINT_CANCELLING,Events.PRINT_CANCELLED,Events.ERROR):
-					self.print_started_relays = False
+			self._logger.info("Test1!")
+			if self.print_started_relays == True and self.relay_auto1_enabled():
+				self._logger.info("Test2!")
+				GPIO.output(self.pin_relay_auto1, GPIO.LOW)
+				if self.relay_auto1_timeon_enabled():
+					sleep(self.relay_auto1_timeon)
+				if self.relay_auto1_timeout_enabled():
 					GPIO.output(self.pin_relay_auto1, GPIO.HIGH)
+					sleep(self.relay_auto1_timeout)
+
+			if self.print_started_relays == True and self.relay_auto2_enabled():
+				self._logger.info("Test3!")
+				GPIO.output(self.pin_relay_auto2, GPIO.LOW)
+				if self.relay_auto2_timeon_enabled():
+					sleep(self.relay_auto2_timeon)
+				if self.relay_auto2_timeout_enabled():
 					GPIO.output(self.pin_relay_auto2, GPIO.HIGH)
-					break
+					sleep(self.relay_auto2_timeout)
+
+			if event in (Events.PRINT_DONE,Events.PRINT_FAILED,Events.PRINT_CANCELLING,Events.PRINT_CANCELLED,Events.ERROR):
+				self._logger.info("Test4!")
+				self.print_started_relays = False
+				GPIO.output(self.pin_relay_auto1, GPIO.HIGH)
+				GPIO.output(self.pin_relay_auto2, GPIO.HIGH)
+				break
 
 	def get_update_information(self):
 		return dict(
@@ -389,7 +393,7 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
 		)
 
 __plugin_name__ = "FilamentSensor OrangePiPc"
-__plugin_version__ = "2.1.53"
+__plugin_version__ = "2.1.54"
 __plugin_pythoncompat__ = ">=2.7,<4"
 
 def __plugin_check__():
