@@ -40,19 +40,19 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
 
 	@property
 	def relay_auto1_timeon(self):
-		return str(self._settings.get(["relay_auto1_timeon"]))
+		return int(self._settings.get(["relay_auto1_timeon"]))
 
 	@property
 	def relay_auto1_timeout(self):
-		return str(self._settings.get(["relay_auto1_timeout"]))
+		return int(self._settings.get(["relay_auto1_timeout"]))
 
 	@property
 	def relay_auto2_timeon(self):
-		return str(self._settings.get(["relay_auto2_timeon"]))
+		return int(self._settings.get(["relay_auto2_timeon"]))
 
 	@property
 	def relay_auto2_timeout(self):
-		return str(self._settings.get(["relay_auto2_timeout"]))
+		return int(self._settings.get(["relay_auto2_timeout"]))
 
 	@property
 	def switch(self):
@@ -365,7 +365,7 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
 		)
 
 __plugin_name__ = "FilamentSensor OrangePiPc"
-__plugin_version__ = "2.1.32"
+__plugin_version__ = "2.1.33"
 __plugin_pythoncompat__ = ">=2.7,<4"
 
 def __plugin_check__():
