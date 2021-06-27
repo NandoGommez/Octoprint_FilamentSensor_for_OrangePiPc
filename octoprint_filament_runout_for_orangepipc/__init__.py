@@ -246,6 +246,9 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
 					if self.relay_auto2_timeout_enabled():
 						GPIO.output(self.pin_relay_auto2, GPIO.LOW)
 						sleep(self.relay_auto2_timeout)
+			else:
+				GPIO.output(self.pin_relay_auto1, GPIO.HIGH)
+				GPIO.output(self.pin_relay_auto2, GPIO.HIGH)
 
 		elif event is Events.PRINT_RESUMED:
 			# Prevent resume print when Filament Sensor is Triggered
@@ -369,7 +372,7 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
 		)
 
 __plugin_name__ = "FilamentSensor OrangePiPc"
-__plugin_version__ = "2.1.35"
+__plugin_version__ = "2.1.36"
 __plugin_pythoncompat__ = ">=2.7,<4"
 
 def __plugin_check__():
