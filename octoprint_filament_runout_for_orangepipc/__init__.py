@@ -27,6 +27,10 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
 		self.relay_send_alert_count = 0
 
 	@property
+	def pin_relay_test(self):
+		return str("PA8")
+
+	@property
 	def pin(self):
 		return str(self._settings.get(["pin"]))
 
@@ -90,6 +94,7 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
 		if self.filament_sensor_enabled():
 			self._logger.info("Filament Sensor active on GPIO Pin [%s]"%self.pin)
 			GPIO.setup(self.pin, GPIO.IN)
+			GPIO.setup(self.pin_relay_test, GPIO.OUT)
 			try:
 				GPIO.remove_event_detect(self.pin)
 			except:
@@ -171,9 +176,9 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
 																		  msg="Enabling Relay Sensor."))
 
 			while True:
-				GPIO.output(self.pin, GPIO.HIGH)
+				GPIO.output(self.pin_relay_test, GPIO.HIGH)
 				sleep(60)
-				GPIO.output(self.pin, GPIO.LOW)
+				GPIO.output(self.pin_relay_test, GPIO.LOW)
 				sleep(60)
 
 		elif event is Events.PRINT_RESUMED:
@@ -294,7 +299,7 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
 		)
 
 __plugin_name__ = "FilamentSensor OrangePiPc"
-__plugin_version__ = "2.1.29"
+__plugin_version__ = "2.1.30"
 __plugin_pythoncompat__ = ">=2.7,<4"
 
 def __plugin_check__():
