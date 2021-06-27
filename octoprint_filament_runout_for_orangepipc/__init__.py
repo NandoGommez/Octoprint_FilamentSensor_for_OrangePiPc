@@ -147,6 +147,26 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
 	def on_after_startup(self):
 		self._logger.info("Filament and Relay Sensor Started")
 		self._setup_sensor()
+		while True:
+			if self.on_printing:
+				if self.relay_auto1_enabled():
+					GPIO.output(self.pin_relay_auto1, GPIO.LOW)
+					if self.relay_auto1_timeon_enabled():
+						sleep(self.relay_auto1_timeon)
+					if self.relay_auto1_timeout_enabled():
+						GPIO.output(self.pin_relay_auto1, GPIO.HIGH)
+						sleep(self.relay_auto1_timeout)
+
+				if self.relay_auto2_enabled():
+					GPIO.output(self.pin_relay_auto2, GPIO.LOW)
+					if self.relay_auto2_timeon_enabled():
+						sleep(self.relay_auto2_timeon)
+					if self.relay_auto2_timeout_enabled():
+						GPIO.output(self.pin_relay_auto2, GPIO.HIGH)
+						sleep(self.relay_auto2_timeout)
+			else:
+				GPIO.cleanup( (self.pin_relay_auto1, self.pin_relay_auto2) )
+				break
 
 	def get_settings_defaults(self):
 		return({
@@ -218,28 +238,6 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
 
 	def get_template_configs(self):
 		return [dict(type="settings", custom_bindings=False)]
-
-	def relays(self, event, payload):
-		while True:
-			if self.on_printing:
-				if self.relay_auto1_enabled():
-					GPIO.output(self.pin_relay_auto1, GPIO.LOW)
-					if self.relay_auto1_timeon_enabled():
-						sleep(self.relay_auto1_timeon)
-					if self.relay_auto1_timeout_enabled():
-						GPIO.output(self.pin_relay_auto1, GPIO.HIGH)
-						sleep(self.relay_auto1_timeout)
-
-				if self.relay_auto2_enabled():
-					GPIO.output(self.pin_relay_auto2, GPIO.LOW)
-					if self.relay_auto2_timeon_enabled():
-						sleep(self.relay_auto2_timeon)
-					if self.relay_auto2_timeout_enabled():
-						GPIO.output(self.pin_relay_auto2, GPIO.HIGH)
-						sleep(self.relay_auto2_timeout)
-			else:
-				GPIO.cleanup( (self.pin_relay_auto1, self.pin_relay_auto2) )
-				break
 
 	def on_event(self, event, payload):
 		if event is Events.PRINT_STARTED:
@@ -376,7 +374,7 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
 		)
 
 __plugin_name__ = "FilamentSensor OrangePiPc"
-__plugin_version__ = "2.1.39"
+__plugin_version__ = "2.1.40"
 __plugin_pythoncompat__ = ">=2.7,<4"
 
 def __plugin_check__():
