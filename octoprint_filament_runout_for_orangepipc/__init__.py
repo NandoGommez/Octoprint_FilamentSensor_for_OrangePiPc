@@ -279,6 +279,10 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
 		):
 			self.debug_only_output("%s: Disabling filament sensor." % (event))
 			self.print_started = False
+			if self.relay_auto1_enabled():
+				GPIO.output(self.pin_relay_auto1, GPIO.LOW)
+			if self.relay_auto2_enabled():
+				GPIO.output(self.pin_relay_auto2, GPIO.LOW)
 
 		elif event is Events.PRINT_PAUSED:
 			self.print_started = False
