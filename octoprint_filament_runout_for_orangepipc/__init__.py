@@ -368,11 +368,13 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
 		if self.timerR1 and self.relay_auto1_enabled():
 			self._logger.info("stopping timer Relay1")
 			self.timerR1.cancel()
+			sleep(5)
 			GPIO.output(self.pin_relay_auto1, GPIO.LOW)
 
 		if self.timerR2 and self.relay_auto2_enabled():
 			self._logger.info("stopping timer Relay2")
 			self.timerR2.cancel()
+			sleep(5)
 			GPIO.output(self.pin_relay_auto2, GPIO.LOW)
 
 	def _setup_relay1(self):
@@ -409,7 +411,7 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
 		)
 
 __plugin_name__ = "FilamentSensor OrangePiPc"
-__plugin_version__ = "2.1.60"
+__plugin_version__ = "2.1.61"
 __plugin_pythoncompat__ = ">=2.7,<4"
 
 def __plugin_check__():
