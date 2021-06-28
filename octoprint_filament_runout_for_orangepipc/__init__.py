@@ -348,29 +348,36 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
 	def startTimerRelays(self):
 		intervalRelay1 = self.relay_auto1_timeon
 		intervalRelay2 = self.relay_auto2_timeon
-		self.timerR1 = octoprint.util.RepeatedTimer(
-		intervalRelay1, self._setup_relay1, run_first=True
-		)
-		self.timerR2 = octoprint.util.RepeatedTimer(
-		intervalRelay2, self._setup_relay2, run_first=True
-		)
-		self.timerR1.start()
-		self.timerR2.start()
+		if self.relay_auto1_timeon_enabled():
+			self.timerR1 = octoprint.util.RepeatedTimer(
+			intervalRelay1, self._setup_relay1, run_first=True
+			)
+			self.timerR1.start()
+		else:
+			self._setup_relay1()
+
+		if self.relay_auto2_timeon_enabled():
+			self.timerR2 = octoprint.util.RepeatedTimer(
+			intervalRelay2, self._setup_relay2, run_first=True
+			)
+			self.timerR2.start()
+		else:
+			self._setup_relay2()
 
 	def stopTimerRelays(self):
-		if self.timerR1:
+		if self.timerR1 and self.relay_auto1_enabled():
 			self._logger.info("stopping timer Relay1")
 			self.timerR1.cancel()
 			GPIO.output(self.pin_relay_auto1, GPIO.LOW)
 
-		if self.timerR2:
+		if self.timerR2 and self.relay_auto2_enabled():
 			self._logger.info("stopping timer Relay2")
 			self.timerR2.cancel()
 			GPIO.output(self.pin_relay_auto2, GPIO.LOW)
 
 	def _setup_relay1(self):
 		if self.relay_auto1_enabled():
-			self._logger.info("Call Relay1!")
+			#self._logger.info("Call Relay1!")
 			GPIO.output(self.pin_relay_auto1, GPIO.LOW)
 			if self.relay_auto1_timeout_enabled():
 				sleep(self.relay_auto1_timeout)
@@ -378,7 +385,7 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
 
 	def _setup_relay2(self):
 		if self.relay_auto2_enabled():
-			self._logger.info("Call Relay2!")
+			#self._logger.info("Call Relay2!")
 			GPIO.output(self.pin_relay_auto2, GPIO.LOW)
 			if self.relay_auto2_timeout_enabled():
 				sleep(self.relay_auto2_timeout)
@@ -402,7 +409,7 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
 		)
 
 __plugin_name__ = "FilamentSensor OrangePiPc"
-__plugin_version__ = "2.1.58"
+__plugin_version__ = "2.1.59"
 __plugin_pythoncompat__ = ">=2.7,<4"
 
 def __plugin_check__():
