@@ -383,7 +383,8 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
 			GPIO.output(self.pin_relay_auto1, GPIO.LOW)
 			if self.relay_auto1_timeout_enabled():
 				sleep(self.relay_auto1_timeout)
-				GPIO.output(self.pin_relay_auto1, GPIO.HIGH)
+				if self.relay_send_alert == False:
+					GPIO.output(self.pin_relay_auto1, GPIO.HIGH)
 
 	def _setup_relay2(self):
 		if self.relay_auto2_enabled():
@@ -391,7 +392,8 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
 			GPIO.output(self.pin_relay_auto2, GPIO.LOW)
 			if self.relay_auto2_timeout_enabled():
 				sleep(self.relay_auto2_timeout)
-				GPIO.output(self.pin_relay_auto2, GPIO.HIGH)
+				if self.relay_send_alert == False:
+					GPIO.output(self.pin_relay_auto2, GPIO.HIGH)
 
 	def get_update_information(self):
 		return dict(
@@ -411,7 +413,7 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
 		)
 
 __plugin_name__ = "FilamentSensor OrangePiPc"
-__plugin_version__ = "2.1.61"
+__plugin_version__ = "2.1.62"
 __plugin_pythoncompat__ = ">=2.7,<4"
 
 def __plugin_check__():
