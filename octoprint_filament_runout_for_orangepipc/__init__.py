@@ -327,6 +327,8 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
 			if self.confirmations<=self.relay_send_alert_count:
 				self.relay_send_alert = True
 				self.relay_send_alert_count = 0
+				GPIO.output(self.pin_relay_auto1, GPIO.LOW)
+				GPIO.output(self.pin_relay_auto2, GPIO.LOW)
 				self._logger.info("Relay Sensor Triggered!")
 				self._plugin_manager.send_plugin_message(self._identifier,
 																	 dict(title="Relay Sensor", type="error", autoClose=False,
@@ -413,7 +415,7 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
 		)
 
 __plugin_name__ = "FilamentSensor OrangePiPc"
-__plugin_version__ = "2.1.62"
+__plugin_version__ = "2.1.63"
 __plugin_pythoncompat__ = ">=2.7,<4"
 
 def __plugin_check__():
