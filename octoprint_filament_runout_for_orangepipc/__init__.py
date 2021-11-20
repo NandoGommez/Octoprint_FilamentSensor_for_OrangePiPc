@@ -72,8 +72,12 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
 		return int(self._settings.get(["poll_time"]))
 
 	@property
-	def confirmations(self):
-		return int(self._settings.get(["confirmations"]))
+	def confirmations_relay1(self):
+		return int(self._settings.get(["confirmations_relay1"]))
+
+	@property
+	def confirmations_relay2(self):
+		return int(self._settings.get(["confirmations_relay2"]))
 
 	@property
 	def debug_mode(self):
@@ -162,7 +166,8 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
 			'pin_relay':'-1',   # Default is no pin
 			'switch_pin_relay':0,	# Normally Open
 			'poll_time':250,  # Debounce 250ms
-			'confirmations':1,# Confirm that we're actually out of filament
+			'confirmations_relay1':1,# Confirm that we're actually out of filament
+			'confirmations_relay2':1,# Confirm that we're actually triggered
 			'no_filament_gcode':'M600',
 			'gcode_relay':'M112',
 			'debug_mode':0, # Debug off!
@@ -297,8 +302,8 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
 		while GPIO.input(self.pin) == self.switch:
 			sleep(self.poll_time/1000)
 			self.filament_send_alert_count+=1
-			self.debug_only_output('Confirmations: '+str(self.filament_send_alert_count))
-			if self.confirmations<=self.filament_send_alert_count:
+			self.debug_only_output('Confirmations Relay 1: '+str(self.filament_send_alert_count))
+			if self.confirmations_relay1<=self.filament_send_alert_count:
 				self.filament_send_alert = True
 				self.filament_send_alert_count = 0
 				self._logger.info("Filament Sensor Triggered!")
@@ -322,9 +327,9 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
 	def relay_sensor_callback(self, _):
 		while GPIO.input(self.pin_relay) == self.switch_pin_relay:
 			self.relay_send_alert_count+=1
-			self.debug_only_output('Confirmations: '+str(self.relay_send_alert_count))
+			self.debug_only_output('Confirmations Relay 2: '+str(self.relay_send_alert_count))
 			sleep(self.poll_time/1000)
-			if self.confirmations<=self.relay_send_alert_count:
+			if self.confirmations_relay2<=self.relay_send_alert_count:
 				self.relay_send_alert = True
 				self.relay_send_alert_count = 0
 				GPIO.output(self.pin_relay_auto1, GPIO.LOW)
@@ -415,7 +420,7 @@ class FilamentSensorOrangePiPcPlugin(octoprint.plugin.StartupPlugin,
 		)
 
 __plugin_name__ = "FilamentSensor OrangePiPc"
-__plugin_version__ = "2.1.63"
+__plugin_version__ = "2.1.64"
 __plugin_pythoncompat__ = ">=2.7,<4"
 
 def __plugin_check__():
